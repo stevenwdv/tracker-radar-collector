@@ -4,12 +4,24 @@ const URL = require('url').URL;
 
 class APICallCollector extends BaseCollector {
 
+    /**
+     * @param {import('./APICalls/breakpoints').BreakpointObject[]} breakpoints
+     */
+    constructor(breakpoints = require('./APICalls/breakpoints')) {
+        super();
+
+        /**
+         * @type {import('./APICalls/breakpoints').BreakpointObject[]}
+         */
+        this._breakpoints = breakpoints;
+    }
+
     id() {
         return 'apis';
     }
 
     /**
-     * @param {import('./BaseCollector').CollectorInitOptions} options 
+     * @param {import('./BaseCollector').CollectorInitOptions} options
      */
     init({log}) {
         /**
@@ -24,10 +36,10 @@ class APICallCollector extends BaseCollector {
     }
 
     /**
-     * @param {{cdpClient: import('puppeteer').CDPSession, url: string, type: import('./TargetCollector').TargetType}} targetInfo 
+     * @param {{cdpClient: import('puppeteer').CDPSession, url: string, type: import('./TargetCollector').TargetType}} targetInfo
      */
     async addTarget({cdpClient, url}) {
-        const trackerTracker = new TrackerTracker(cdpClient.send.bind(cdpClient));
+        const trackerTracker = new TrackerTracker(cdpClient.send.bind(cdpClient), this._breakpoints);
         trackerTracker.setMainURL(url.toString());
 
         cdpClient.on('Runtime.bindingCalled', this.onBindingCalled.bind(this, trackerTracker));
@@ -45,7 +57,7 @@ class APICallCollector extends BaseCollector {
     /**
      * @param {TrackerTracker} trackerTracker
      * @param {import('puppeteer').CDPSession} cdpClient
-     * @param {{context: {id: string, origin: string, auxData: {type: string}}}} params 
+     * @param {{context: {id: string, origin: string, auxData: {type: string}}}} params
      */
     async onExecutionContextCrated(trackerTracker, cdpClient, params) {
         // ignore context created by puppeteer / our crawler
@@ -58,7 +70,7 @@ class APICallCollector extends BaseCollector {
 
     /**
      * @param {TrackerTracker} trackerTracker
-     * @param {{payload: string, description: string, executionContextId: number}} params 
+     * @param {{payload: string, description: string, executionContextId: number}} params
      */
     onBindingCalled(trackerTracker, params) {
         const breakpoint = trackerTracker.processDebuggerPause(params);
@@ -71,20 +83,21 @@ class APICallCollector extends BaseCollector {
                 sourceStats = new Map();
                 this._stats.set(breakpoint.source, sourceStats);
             }
-    
+
             let count = 0;
-    
+
             if (sourceStats.has(breakpoint.description)) {
                 count = sourceStats.get(breakpoint.description);
             }
-    
+
             sourceStats.set(breakpoint.description, count + 1);
 
             if (breakpoint.saveArguments) {
                 this._calls.push({
                     source: breakpoint.source,
                     description: breakpoint.description,
-                    arguments: breakpoint.arguments
+                    arguments: breakpoint.arguments,
+                    custom: breakpoint.custom
                 });
             }
         }
@@ -92,7 +105,7 @@ class APICallCollector extends BaseCollector {
     }
 
     /**
-     * @param {string} urlString 
+     * @param {string} urlString
      * @param {function(string):boolean} urlFilter
      */
     isAcceptableUrl(urlString, urlFilter) {
@@ -135,7 +148,7 @@ class APICallCollector extends BaseCollector {
                         return result;
                     }, {});
             });
-    
+
         return {
             callStats,
             savedCalls: this._calls.filter(call => this.isAcceptableUrl(call.source, urlFilter))
@@ -154,6 +167,7 @@ module.exports = APICallCollector;
  * @property {string} source - source script
  * @property {string} description - breakpoint description
  * @property {string[]} arguments - preview or the passed arguments
+ * @property {any} custom - custom captured data
  */
 
 /**

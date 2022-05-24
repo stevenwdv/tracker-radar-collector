@@ -1,13 +1,13 @@
 const MAX_ASYNC_CALL_STACK_DEPTH = 32;// max depth of async calls tracked
-const allBreakpoints = require('./breakpoints.js');
 const URL = require('url').URL;
 const STACK_SOURCE_REGEX = /\((https?:\/\/.*?):[0-9]+:[0-9]+\)/i;
 
 class TrackerTracker {
     /**
-     * @param {function(string, object=): Promise<object>} sendCommand 
+     * @param {function(string, object=): Promise<object>} sendCommand
+     * @param {import('./breakpoints').BreakpointObject[]} breakpoints
      */
-    constructor(sendCommand) {
+    constructor(sendCommand, breakpoints) {
         /**
          * @type {function(...any): void}
          */
@@ -20,10 +20,14 @@ class TrackerTracker {
          * @type {string}
          */
         this._mainURL = '';
+        /**
+         * @type {import('./breakpoints').BreakpointObject[]}
+         */
+        this._breakpoints = breakpoints;
     }
 
     /**
-     * @param {{log: function(...any): void}} options 
+     * @param {{log: function(...any): void}} options
      */
     async init({log}) {
         this._log = log;
@@ -36,8 +40,8 @@ class TrackerTracker {
     }
 
     /**
-     * @param {string} command 
-     * @param {object} payload 
+     * @param {string} command
+     * @param {object} payload
      * @returns {Promise<object>}
      */
     sendCommand(command, payload = {}) {
@@ -45,20 +49,21 @@ class TrackerTracker {
     }
 
     /**
-     * @param {string} url 
+     * @param {string} url
      */
     setMainURL(url) {
         this._mainURL = url;
     }
 
     /**
-     * @param {string} expression 
-     * @param {string} condition 
-     * @param {string} description 
+     * @param {string} expression
+     * @param {string} condition
+     * @param {string} description
      * @param {boolean} saveArguments
-     * @param {CDPContextId} contextId 
+     * @param {CDPContextId} contextId
+     * @param {(string | function(any): any)} customCapture?
      */
-    async _addBreakpoint(expression, condition, description, contextId, saveArguments) {
+    async _addBreakpoint(expression, condition, description, contextId, saveArguments, customCapture) {
         try {
             /**
              * @type {{result:{objectId: string, description: string}, exceptionDetails:{}}}
@@ -74,10 +79,18 @@ class TrackerTracker {
                 throw new Error('API unavailable in given context.');
             }
 
+            if (!customCapture) customCapture = () => undefined;
+
+            if (!(customCapture instanceof Function)) {
+                // Check syntax
+                const ignore = new Function(String(customCapture));
+            }
+
             let conditionScript = `
                 const data = {
                     description: '${description}',
-                    stack: (new Error()).stack
+                    stack: (new Error()).stack,
+                    custom: (${String(customCapture)})(this)
                 };
             `;
 
@@ -120,37 +133,37 @@ class TrackerTracker {
     }
 
     /**
-     * @param {CDPContextId} contextId 
+     * @param {CDPContextId} contextId
      */
     async setupContextTracking(contextId = undefined) {
-        const allBreakpointsSet = allBreakpoints
+        const allBreakpointsSet = this._breakpoints
             .map(async ({proto, global, props, methods}) => {
                 const obj = global || `${proto}.prototype`;
 
                 const propPromises = props.map(async prop => {
                     const expression = `Reflect.getOwnPropertyDescriptor(${obj}, '${prop.name}').${prop.setter === true ? 'set' : 'get'}`;
                     const description = prop.description || `${obj}.${prop.name}`;
-                    await this._addBreakpoint(expression, prop.condition, description, contextId, Boolean(prop.saveArguments));
+                    await this._addBreakpoint(expression, prop.condition, description, contextId, Boolean(prop.saveArguments), prop.customCapture);
                 });
-    
+
                 await Promise.all(propPromises);
-    
+
                 const methodPromises = methods.map(async method => {
                     const expression = `Reflect.getOwnPropertyDescriptor(${obj}, '${method.name}').value`;
                     const description = method.description || `${obj}.${method.name}`;
-                    await this._addBreakpoint(expression, method.condition, description, contextId, Boolean(method.saveArguments));
+                    await this._addBreakpoint(expression, method.condition, description, contextId, Boolean(method.saveArguments), method.customCapture);
                 });
-    
+
                 await Promise.all(methodPromises);
             });
-        
+
         await Promise.all(allBreakpointsSet);
     }
 
     /**
      * Return top non-anonymous source from the stack trace.
-     * 
-     * @param {string} stack JS stack trace 
+     *
+     * @param {string} stack JS stack trace
      * @returns {string}
      */
     _getScriptURL(stack) {
@@ -174,10 +187,10 @@ class TrackerTracker {
 
     /**
      * @param {string} breakpointName
-     * @returns {import('./breakpoints').MethodBreakpoint|import('./breakpoints').PropertyBreakpoint} 
+     * @returns {import('./breakpoints').MethodBreakpoint|import('./breakpoints').PropertyBreakpoint}
      */
     _getBreakpointByName(breakpointName) {
-        for (let breakpoint of allBreakpoints) {
+        for (let breakpoint of this._breakpoints) {
             const {proto, global, props, methods} = breakpoint;
             const obj = global || `${proto}.prototype`;
             const matchingProp = props.find(prop => (prop.description || `${obj}.${prop.name}`) === breakpointName);
@@ -198,11 +211,11 @@ class TrackerTracker {
 
     /**
      * @param {{payload: string, description: string, executionContextId: number}} params
-     * @returns {{description: string, source: string, saveArguments: boolean, arguments: string[]}}
+     * @returns {{description: string, source: string, saveArguments: boolean, arguments: string[], custom: any}}
      */
     processDebuggerPause(params) {
         let payload = null;
-        
+
         try {
             payload = JSON.parse(params.payload);
         } catch(e) {
@@ -238,7 +251,8 @@ class TrackerTracker {
             description: payload.description,
             saveArguments: breakpoint.saveArguments,
             arguments: payload.args,
-            source: script
+            source: script,
+            custom: payload.custom
         };
     }
 }

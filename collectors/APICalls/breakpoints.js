@@ -1,6 +1,6 @@
 /* eslint-disable max-lines */
 /**
- * @type {{global?: string, proto?: string, props: PropertyBreakpoint[], methods: MethodBreakpoint[]}[]}
+ * @type {BreakpointObject[]}
  */
 const breakpoints = [
     {
@@ -56,7 +56,7 @@ const breakpoints = [
     //     ]
     // },
     {
-        global: 'Reflect.getPrototypeOf(document.fonts)',// .prototype .__proto__ and getting method from global object dont' work here 
+        global: 'Reflect.getPrototypeOf(document.fonts)',// .prototype .__proto__ and getting method from global object dont' work here
         props: [
         ],
         methods: [
@@ -398,7 +398,7 @@ const breakpoints = [
     //     ]
     // },
     {
-        global: 'speechSynthesis.__proto__',// both .prototype and getting method from global object don't work here 
+        global: 'speechSynthesis.__proto__',// both .prototype and getting method from global object don't work here
         props: [],
         methods: [
             {
@@ -551,12 +551,21 @@ const breakpoints = [
 module.exports = breakpoints;
 
 /**
+ * @typedef BreakpointObject
+ * @property {string=} global
+ * @property {string=} proto
+ * @property {PropertyBreakpoint[]} props
+ * @property {MethodBreakpoint[]} methods
+ */
+
+/**
  * @typedef MethodBreakpoint
  * @property {string} name - name of the method
  * @property {string=} test - test expression that should trigger given breakpoint
  * @property {string=} description - human redable description of a breakpoint
  * @property {string=} condition - additional condition that has to be truthy for the breakpoint to fire
  * @property {boolean=} saveArguments - save arguments of each call (defaults to false)
+ * @property {(string | function(any): any)=} customCapture custom capturing function
  */
 
  /**
@@ -567,4 +576,5 @@ module.exports = breakpoints;
  * @property {string=} condition - additional condition that has to be truthy for the breakpoint to fire
  * @property {boolean=} saveArguments - save arguments of each call (defaults to false)
  * @property {boolean=} setter - hook up to a property setter instead of getter (which is a default)
+ * @property {(string | function(any): any)=} customCapture custom capturing function
  */

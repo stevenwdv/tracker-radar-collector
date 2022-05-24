@@ -1,6 +1,8 @@
 const crawlerConductor = require('./crawlerConductor');
 const crawler = require('./crawler');
+const breakpoints = require('./collectors/APICalls/breakpoints');
 
+const BaseCollector = require('./collectors/BaseCollector')
 const RequestCollector = require('./collectors/RequestCollector');
 const APICallCollector = require('./collectors/APICallCollector');
 const CookieCollector = require('./collectors/CookieCollector');
@@ -14,6 +16,7 @@ const CMPCollector = require('./collectors/CMPCollector');
 module.exports = {
     crawler,
     crawlerConductor,
+    breakpoints,
     // collectors ↓
     RequestCollector,
     APICallCollector,
@@ -22,4 +25,6 @@ module.exports = {
     TraceCollector,
     ScreenshotCollector,
     CMPCollector,
+    // types for custom collectors ↓
+    BaseCollector,
 };
