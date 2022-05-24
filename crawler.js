@@ -280,7 +280,8 @@ function isThirdPartyRequest(documentUrl, requestUrl) {
  * @param {{collectors?: import('./collectors/BaseCollector')[], log?: function(...any):void, filterOutFirstParty?: boolean, emulateMobile?: boolean, emulateUserAgent?: boolean, proxyHost?: string, browserContext?: puppeteer.BrowserContext, runInEveryFrame?: function():void, executablePath?: string, maxLoadTimeMs?: number, extraExecutionTimeMs?: number, collectorFlags?: Object.<string, boolean>}} options
  * @returns {Promise<CollectResult>}
  */
-module.exports = async (url, options) => {
+
+async function crawl(url, options) {
     const log = options.log || (() => {});
     const browser = options.browserContext ? null : await openBrowser(log, options.proxyHost, options.executablePath);
     // Create a new incognito browser context.
@@ -316,7 +317,9 @@ module.exports = async (url, options) => {
     }
 
     return data;
-};
+}
+
+module.exports = crawl;
 
 /**
  * @typedef {Object} CollectResult

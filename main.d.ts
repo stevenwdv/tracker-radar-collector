@@ -1,0 +1,12 @@
+import crawler = require("./crawler");
+import crawlerConductor = require("./crawlerConductor");
+import breakpoints = require("./collectors/APICalls/breakpoints");
+import RequestCollector = require("./collectors/RequestCollector");
+import APICallCollector = require("./collectors/APICallCollector");
+import CookieCollector = require("./collectors/CookieCollector");
+import TargetCollector = require("./collectors/TargetCollector");
+import TraceCollector = require("./collectors/TraceCollector");
+import ScreenshotCollector = require("./collectors/ScreenshotCollector");
+import CMPCollector = require("./collectors/CMPCollector");
+import BaseCollector = require("./collectors/BaseCollector");
+export { crawler, crawlerConductor, breakpoints, RequestCollector, APICallCollector, CookieCollector, TargetCollector, TraceCollector, ScreenshotCollector, CMPCollector, BaseCollector };
