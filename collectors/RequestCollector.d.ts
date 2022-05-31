@@ -17,6 +17,7 @@ declare class RequestCollector extends BaseCollector {
      * @type {Map<string, InternalRequestData>}
      */
     _unmatched: Map<string, InternalRequestData>;
+    _headersFromRequestWillBeSentExtraInfo: Map<any, any>;
     _log: (...arg0: any[]) => void;
     /**
      * @param {{cdpClient: import('puppeteer').CDPSession, url: string, type: import('./TargetCollector').TargetType}} targetInfo
@@ -36,7 +37,7 @@ declare class RequestCollector extends BaseCollector {
      */
     getResponseBodyHash(id: RequestId, cdp: import('puppeteer').CDPSession): Promise<string>;
     /**
-     * @param {{initiator: import('../helpers/initiators').RequestInitiator, request: CDPRequest, requestId: RequestId, timestamp: Timestamp, frameId?: FrameId, type?: ResourceType, redirectResponse?: CDPResponse}} data
+     * @param {{initiator: import('../helpers/initiators').RequestInitiator, request: CDPRequest, requestId: RequestId, timestamp: Timestamp, frameId?: FrameId, type?: ResourceType, redirectResponse?: CDPResponse, wallTime: number}} data
      * @param {import('puppeteer').CDPSession} cdp
      */
     handleRequest(data: {
@@ -47,6 +48,7 @@ declare class RequestCollector extends BaseCollector {
         frameId?: FrameId;
         type?: ResourceType;
         redirectResponse?: CDPResponse;
+        wallTime: number;
     }, cdp: import('puppeteer').CDPSession): void;
     /**
      * @param {{requestId: RequestId, url: string, initiator: import('../helpers/initiators').RequestInitiator}} request
@@ -57,6 +59,18 @@ declare class RequestCollector extends BaseCollector {
         initiator: import('../helpers/initiators').RequestInitiator;
     }): void;
     /**
+     * @param {{requestId: RequestId, timestamp: number, response: {opcode: number,  mask: boolean, payloadData: string}}} request
+     */
+    handleWebSocketFrameSent(request: {
+        requestId: RequestId;
+        timestamp: number;
+        response: {
+            opcode: number;
+            mask: boolean;
+            payloadData: string;
+        };
+    }): void;
+    /**
      * @param {{requestId: RequestId, type: ResourceType, frameId?: FrameId, response: CDPResponse}} data
      */
     handleResponse(data: {
@@ -64,6 +78,17 @@ declare class RequestCollector extends BaseCollector {
         type: ResourceType;
         frameId?: FrameId;
         response: CDPResponse;
+    }): void;
+    /**
+    * Network.requestWillBeSentExtraInfo
+    * @param {{requestId: RequestId, associatedCookies: object, headers: Object<string, string>}} data
+    */
+    handleRequestWillBeSentExtraInfo(data: {
+        requestId: RequestId;
+        associatedCookies: object;
+        headers: {
+            [x: string]: string;
+        };
     }): void;
     /**
      * Network.responseReceivedExtraInfo
@@ -117,6 +142,9 @@ type InternalRequestData = {
     redirectedTo?: string | undefined;
     status?: number | undefined;
     remoteIPAddress?: string | undefined;
+    requestHeaders?: {
+        [x: string]: string;
+    } | undefined;
     responseHeaders?: {
         [x: string]: string;
     } | undefined;
@@ -124,7 +152,9 @@ type InternalRequestData = {
     size?: number | undefined;
     startTime?: Timestamp | undefined;
     endTime?: Timestamp | undefined;
+    wallTime?: number | undefined;
     responseBodyHash?: string | undefined;
+    postData?: string | undefined;
 };
 type RequestId = string;
 type CDPRequest = {
@@ -132,6 +162,7 @@ type CDPRequest = {
     method: HttpMethod;
     headers: object;
     initialPriority: 'VeryLow' | 'Low' | 'Medium' | 'High' | 'VeryHigh';
+    postData: string;
 };
 type Timestamp = number;
 type FrameId = string;
@@ -154,16 +185,22 @@ type RequestData = {
     redirectedTo?: string | undefined;
     status?: number | undefined;
     remoteIPAddress: string;
+    requestHeaders: object;
     responseHeaders: object;
     responseBodyHash?: string | undefined;
+    postData?: string | undefined;
     failureReason: string;
     /**
      * in bytes
      */
     size?: number | undefined;
     /**
-     * in seconds
+     * duration in seconds
      */
     time?: number | undefined;
+    /**
+     * of the request in seconds since the unix epoch
+     */
+    wallTime?: number | undefined;
 };
 type HttpMethod = 'GET' | 'PUT' | 'POST' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'CONNNECT' | 'TRACE' | 'PATCH';
