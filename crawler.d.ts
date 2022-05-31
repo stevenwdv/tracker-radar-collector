@@ -1,7 +1,7 @@
 export = crawl;
 /**
  * @param {URL} url
- * @param {{collectors?: import('./collectors/BaseCollector')[], log?: function(...any):void, filterOutFirstParty?: boolean, emulateMobile?: boolean, emulateUserAgent?: boolean, proxyHost?: string, browserContext?: puppeteer.BrowserContext, runInEveryFrame?: function():void, executablePath?: string, maxLoadTimeMs?: number, extraExecutionTimeMs?: number, collectorFlags?: Object.<string, boolean>}} options
+ * @param {{collectors?: import('./collectors/BaseCollector')[], log?: function(...any):void, filterOutFirstParty?: boolean, emulateMobile?: boolean, emulateUserAgent?: boolean, proxyHost?: string, browserContext?: puppeteer.BrowserContext, runInEveryFrame?: function():void, executablePath?: string, maxLoadTimeMs?: number, extraExecutionTimeMs?: number, maxCollectionTimeMs?: number, collectorFlags?: Object.<string, boolean>}} options
  * @returns {Promise<CollectResult>}
  */
 declare function crawl(url: URL, options: {
@@ -16,6 +16,7 @@ declare function crawl(url: URL, options: {
     executablePath?: string;
     maxLoadTimeMs?: number;
     extraExecutionTimeMs?: number;
+    maxCollectionTimeMs?: number;
     collectorFlags?: {
         [x: string]: boolean;
     };

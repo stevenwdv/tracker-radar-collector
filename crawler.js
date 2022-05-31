@@ -118,7 +118,7 @@ async function getSiteData(context, url, {
 
         const timer = createTimer();
         let cdpClient = null;
-        
+
         try {
             cdpClient = await target.createCDPSession();
         } catch (e) {
@@ -198,6 +198,7 @@ async function getSiteData(context, url, {
 
     let timeout = false;
 
+    const loadStart = performance.now();
     try {
         await page.goto(url.toString(), {timeout: maxLoadTimeMs, waitUntil: 'networkidle0'});
     } catch (e) {
@@ -215,6 +216,7 @@ async function getSiteData(context, url, {
             throw e;
         }
     }
+    const pageLoadDurationMs = performance.now() - loadStart;
 
     // give website a bit more time for things to settle
     await page.waitForTimeout(extraExecutionTimeMs);
@@ -231,7 +233,8 @@ async function getSiteData(context, url, {
             // eslint-disable-next-line no-await-in-loop
             const collectorData = await collector.getData({
                 finalUrl,
-                urlFilter: urlFilter && urlFilter.bind(null, finalUrl)
+                urlFilter: urlFilter && urlFilter.bind(null, finalUrl),
+                pageLoadDurationMs
             });
             data[collector.id()] = collectorData;
             log(`getting ${collector.id()} data took ${getDataTimer.getElapsedTime()}s`);
@@ -277,7 +280,7 @@ function isThirdPartyRequest(documentUrl, requestUrl) {
 
 /**
  * @param {URL} url
- * @param {{collectors?: import('./collectors/BaseCollector')[], log?: function(...any):void, filterOutFirstParty?: boolean, emulateMobile?: boolean, emulateUserAgent?: boolean, proxyHost?: string, browserContext?: puppeteer.BrowserContext, runInEveryFrame?: function():void, executablePath?: string, maxLoadTimeMs?: number, extraExecutionTimeMs?: number, collectorFlags?: Object.<string, boolean>}} options
+ * @param {{collectors?: import('./collectors/BaseCollector')[], log?: function(...any):void, filterOutFirstParty?: boolean, emulateMobile?: boolean, emulateUserAgent?: boolean, proxyHost?: string, browserContext?: puppeteer.BrowserContext, runInEveryFrame?: function():void, executablePath?: string, maxLoadTimeMs?: number, extraExecutionTimeMs?: number, maxCollectionTimeMs?: number, collectorFlags?: Object.<string, boolean>}} options
  * @returns {Promise<CollectResult>}
  */
 
@@ -291,7 +294,8 @@ async function crawl(url, options) {
 
     const maxLoadTimeMs = options.maxLoadTimeMs || 30000;
     const extraExecutionTimeMs = options.extraExecutionTimeMs || 2500;
-    const maxTotalTimeMs = maxLoadTimeMs * 2;
+    const maxCollectionTimeMs = options.maxCollectionTimeMs || 5000;
+    const maxTotalTimeMs = maxLoadTimeMs * 2 + options.extraExecutionTimeMs + maxCollectionTimeMs;
 
     try {
         data = await wait(getSiteData(context, url, {
