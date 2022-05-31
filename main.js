@@ -2,7 +2,7 @@ const crawlerConductor = require('./crawlerConductor');
 const crawler = require('./crawler');
 const breakpoints = require('./collectors/APICalls/breakpoints');
 
-const BaseCollector = require('./collectors/BaseCollector')
+const BaseCollector = require('./collectors/BaseCollector');
 const RequestCollector = require('./collectors/RequestCollector');
 const APICallCollector = require('./collectors/APICallCollector');
 const CookieCollector = require('./collectors/CookieCollector');

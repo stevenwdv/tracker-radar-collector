@@ -1,13 +1,14 @@
 const BaseCollector = require('./BaseCollector');
 const TrackerTracker = require('./APICalls/TrackerTracker');
 const URL = require('url').URL;
+const defaultBreakpoints = require('./APICalls/breakpoints');
 
 class APICallCollector extends BaseCollector {
 
     /**
      * @param {import('./APICalls/breakpoints').BreakpointObject[]} breakpoints
      */
-    constructor(breakpoints = require('./APICalls/breakpoints')) {
+    constructor(breakpoints = defaultBreakpoints) {
         super();
 
         /**

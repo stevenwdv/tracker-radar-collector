@@ -79,7 +79,9 @@ class TrackerTracker {
                 throw new Error('API unavailable in given context.');
             }
 
-            if (!customCapture) customCapture = () => undefined;
+            if (!customCapture) {
+                customCapture = () => undefined;
+            }
 
             if (!(customCapture instanceof Function)) {
                 // Check syntax

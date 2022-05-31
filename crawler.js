@@ -295,7 +295,7 @@ async function crawl(url, options) {
     const maxLoadTimeMs = options.maxLoadTimeMs || 30000;
     const extraExecutionTimeMs = options.extraExecutionTimeMs || 2500;
     const maxCollectionTimeMs = options.maxCollectionTimeMs || 5000;
-    const maxTotalTimeMs = maxLoadTimeMs * 2 + options.extraExecutionTimeMs + maxCollectionTimeMs;
+    const maxTotalTimeMs = (maxLoadTimeMs * 2) + options.extraExecutionTimeMs + maxCollectionTimeMs;
 
     try {
         data = await wait(getSiteData(context, url, {
