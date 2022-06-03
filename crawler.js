@@ -4,6 +4,7 @@ const chalk = require('chalk').default;
 const {createTimer} = require('./helpers/timer');
 const wait = require('./helpers/wait');
 const tldts = require('tldts');
+const {performance} = require('perf_hooks');
 
 const DEFAULT_USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Safari/537.36';
 const MOBILE_USER_AGENT = 'Mozilla/5.0 (Linux; Android 10; Pixel 2 XL) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.63 Mobile Safari/537.36';
@@ -295,7 +296,7 @@ async function crawl(url, options) {
     const maxLoadTimeMs = options.maxLoadTimeMs || 30000;
     const extraExecutionTimeMs = options.extraExecutionTimeMs || 2500;
     const maxCollectionTimeMs = options.maxCollectionTimeMs || 5000;
-    const maxTotalTimeMs = (maxLoadTimeMs * 2) + options.extraExecutionTimeMs + maxCollectionTimeMs;
+    const maxTotalTimeMs = (maxLoadTimeMs * 2) + extraExecutionTimeMs + maxCollectionTimeMs;
 
     try {
         data = await wait(getSiteData(context, url, {
