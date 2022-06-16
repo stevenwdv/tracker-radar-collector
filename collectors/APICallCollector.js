@@ -98,6 +98,7 @@ class APICallCollector extends BaseCollector {
                     source: breakpoint.source,
                     description: breakpoint.description,
                     arguments: breakpoint.arguments,
+                    stack: breakpoint.stack || undefined,
                     custom: breakpoint.custom
                 });
             }
@@ -168,6 +169,7 @@ module.exports = APICallCollector;
  * @property {string} source - source script
  * @property {string} description - breakpoint description
  * @property {string[]} arguments - preview or the passed arguments
+ * @property {string=} stack - full stack
  * @property {any} custom - custom captured data
  */
 

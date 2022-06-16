@@ -61,9 +61,13 @@ class TrackerTracker {
      * @param {string} description
      * @param {boolean} saveArguments
      * @param {CDPContextId} contextId
+     * @param {boolean} fullStack
      * @param {(string | function(any): any)} customCapture?
      */
-    async _addBreakpoint(expression, condition, description, contextId, saveArguments, customCapture) {
+    async _addBreakpoint(
+        expression, condition, description, contextId, saveArguments,
+        fullStack, customCapture = () => undefined
+    ) {
         try {
             /**
              * @type {{result:{objectId: string, description: string}, exceptionDetails:{}}}
@@ -79,19 +83,17 @@ class TrackerTracker {
                 throw new Error('API unavailable in given context.');
             }
 
-            if (!customCapture) {
-                customCapture = () => undefined;
-            }
-
             if (!(customCapture instanceof Function)) {
-                // Check syntax
-                const ignore = new Function(String(customCapture));
+                // Check syntax (input is trusted)
+                // eslint-disable-next-line no-new-func
+                Function(String(customCapture));
             }
 
             let conditionScript = `
                 const data = {
                     description: '${description}',
                     stack: (new Error()).stack,
+                    fullStack: ${fullStack},
                     custom: (${String(customCapture)})(this)
                 };
             `;
@@ -145,7 +147,7 @@ class TrackerTracker {
                 const propPromises = props.map(async prop => {
                     const expression = `Reflect.getOwnPropertyDescriptor(${obj}, '${prop.name}').${prop.setter === true ? 'set' : 'get'}`;
                     const description = prop.description || `${obj}.${prop.name}`;
-                    await this._addBreakpoint(expression, prop.condition, description, contextId, Boolean(prop.saveArguments), prop.customCapture);
+                    await this._addBreakpoint(expression, prop.condition, description, contextId, Boolean(prop.saveArguments), prop.fullStack, prop.customCapture);
                 });
 
                 await Promise.all(propPromises);
@@ -153,7 +155,7 @@ class TrackerTracker {
                 const methodPromises = methods.map(async method => {
                     const expression = `Reflect.getOwnPropertyDescriptor(${obj}, '${method.name}').value`;
                     const description = method.description || `${obj}.${method.name}`;
-                    await this._addBreakpoint(expression, method.condition, description, contextId, Boolean(method.saveArguments), method.customCapture);
+                    await this._addBreakpoint(expression, method.condition, description, contextId, Boolean(method.saveArguments), method.fullStack, method.customCapture);
                 });
 
                 await Promise.all(methodPromises);
@@ -213,7 +215,7 @@ class TrackerTracker {
 
     /**
      * @param {{payload: string, description: string, executionContextId: number}} params
-     * @returns {{description: string, source: string, saveArguments: boolean, arguments: string[], custom: any}}
+     * @returns {{description: string, source: string, saveArguments: boolean, arguments: string[], stack: ?string, custom: any}}
      */
     processDebuggerPause(params) {
         let payload = null;
@@ -254,6 +256,7 @@ class TrackerTracker {
             saveArguments: breakpoint.saveArguments,
             arguments: payload.args,
             source: script,
+            stack: payload.stack,
             custom: payload.custom
         };
     }

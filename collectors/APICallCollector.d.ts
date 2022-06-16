@@ -85,6 +85,10 @@ type SavedCall = {
      */
     arguments: string[];
     /**
+     * - full stack
+     */
+    stack?: string | undefined;
+    /**
      * - custom captured data
      */
     custom: any;

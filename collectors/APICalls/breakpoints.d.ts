@@ -22,7 +22,7 @@ type MethodBreakpoint = {
      */
     test?: string | undefined;
     /**
-     * - human redable description of a breakpoint
+     * - human-readable description of a breakpoint
      */
     description?: string | undefined;
     /**
@@ -33,6 +33,10 @@ type MethodBreakpoint = {
      * - save arguments of each call (defaults to false)
      */
     saveArguments?: boolean | undefined;
+    /**
+     * save full call stack
+     */
+    fullStack?: boolean | undefined;
     /**
      * custom capturing function
      */
@@ -48,7 +52,7 @@ type PropertyBreakpoint = {
      */
     test?: string | undefined;
     /**
-     * - human redable description of a breakpoint
+     * - human-readable description of a breakpoint
      */
     description?: string | undefined;
     /**
@@ -63,6 +67,10 @@ type PropertyBreakpoint = {
      * - hook up to a property setter instead of getter (which is a default)
      */
     setter?: boolean | undefined;
+    /**
+     * save full call stack
+     */
+    fullStack?: boolean | undefined;
     /**
      * custom capturing function
      */
