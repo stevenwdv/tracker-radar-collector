@@ -91,7 +91,7 @@ type SavedCall = {
     /**
      * - custom captured data
      */
-    custom: any;
+    custom?: any | undefined;
 };
 import TrackerTracker = require("./APICalls/TrackerTracker");
 type APICallData = {

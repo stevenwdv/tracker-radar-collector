@@ -215,7 +215,7 @@ class TrackerTracker {
 
     /**
      * @param {{payload: string, description: string, executionContextId: number}} params
-     * @returns {{description: string, source: string, saveArguments: boolean, arguments: string[], stack: ?string, custom: any}}
+     * @returns {{description: string, source: string, saveArguments: boolean, arguments: string[], stack?: string, custom?: any}}
      */
     processDebuggerPause(params) {
         let payload = null;
@@ -251,14 +251,22 @@ class TrackerTracker {
 
         // this._log('breakpoint', params, script);
 
-        return {
+        /**
+         * @type {{description: string, source: string, saveArguments: boolean, arguments: string[], stack?: string, custom?: any}}
+         */
+        const result = {
             description: payload.description,
             saveArguments: breakpoint.saveArguments,
             arguments: payload.args,
             source: script,
-            stack: payload.stack,
-            custom: payload.custom
         };
+        if (payload.fullStack) {
+            result.stack = payload.stack;
+        }
+        if (payload.custom !== undefined) {
+            result.custom = payload.custom;
+        }
+        return result;
     }
 }
 

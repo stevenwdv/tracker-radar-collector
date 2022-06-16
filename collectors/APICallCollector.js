@@ -94,13 +94,21 @@ class APICallCollector extends BaseCollector {
             sourceStats.set(breakpoint.description, count + 1);
 
             if (breakpoint.saveArguments) {
-                this._calls.push({
+                /**
+                 * @type {SavedCall}
+                 */
+                const call = {
                     source: breakpoint.source,
                     description: breakpoint.description,
                     arguments: breakpoint.arguments,
-                    stack: breakpoint.stack || undefined,
-                    custom: breakpoint.custom
-                });
+                };
+                if (breakpoint.stack) {
+                    call.stack = breakpoint.stack;
+                }
+                if (breakpoint.custom !== undefined) {
+                    call.custom = breakpoint.custom;
+                }
+                this._calls.push(call);
             }
         }
 
@@ -170,7 +178,7 @@ module.exports = APICallCollector;
  * @property {string} description - breakpoint description
  * @property {string[]} arguments - preview or the passed arguments
  * @property {string=} stack - full stack
- * @property {any} custom - custom captured data
+ * @property {any=} custom - custom captured data
  */
 
 /**
