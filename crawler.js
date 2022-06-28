@@ -21,15 +21,17 @@ const MOBILE_VIEWPORT = {
     hasTouch: true
 };
 
-// for debugging: will lunch in window mode instad of headless, open devtools and don't close windows after process finishes
+// for debugging: force to launch in window mode instead of headless, open devtools and don't close windows after process finishes
 const VISUAL_DEBUG = false;
 
 /**
  * @param {function(...any):void} log
  * @param {string} proxyHost
  * @param {string} executablePath path to chromium executable to use
+ * @param {boolean} headless
+ * @param {boolean} devtools
  */
-function openBrowser(log, proxyHost, executablePath) {
+function openBrowser(log, proxyHost, executablePath, headless = true, devtools = false) {
     /**
      * @type {import('puppeteer').BrowserLaunchArgumentOptions}
      */
@@ -40,10 +42,9 @@ function openBrowser(log, proxyHost, executablePath) {
             '--enable-features="FederatedLearningOfCohorts:update_interval/10s/minimum_history_domain_size_required/1,FlocIdSortingLshBasedComputation,InterestCohortFeaturePolicy"'
         ]
     };
-    if (VISUAL_DEBUG) {
-        args.headless = false;
-        args.devtools = true;
-    }
+    args.headless = headless;
+    args.devtools = devtools;
+
     if (proxyHost) {
         let url;
         try {
@@ -66,7 +67,7 @@ function openBrowser(log, proxyHost, executablePath) {
 /**
  * @param {puppeteer.BrowserContext} context
  * @param {URL} url
- * @param {{collectors: import('./collectors/BaseCollector')[], log: function(...any):void, urlFilter: function(string, string):boolean, emulateMobile: boolean, emulateUserAgent: boolean, runInEveryFrame: function():void, maxLoadTimeMs: number, extraExecutionTimeMs: number, collectorFlags: Object.<string, boolean>}} data
+ * @param {GetSiteDataOptions} data
  *
  * @returns {Promise<CollectResult>}
  */
@@ -80,6 +81,7 @@ async function getSiteData(context, url, {
     maxLoadTimeMs,
     extraExecutionTimeMs,
     collectorFlags,
+    keepOpen,
 }) {
     const testStarted = Date.now();
 
@@ -254,7 +256,7 @@ async function getSiteData(context, url, {
         }
     }
 
-    if (!VISUAL_DEBUG) {
+    if (!keepOpen) {
         await page.close();
     }
 
@@ -281,13 +283,16 @@ function isThirdPartyRequest(documentUrl, requestUrl) {
 
 /**
  * @param {URL} url
- * @param {{collectors?: import('./collectors/BaseCollector')[], log?: function(...any):void, filterOutFirstParty?: boolean, emulateMobile?: boolean, emulateUserAgent?: boolean, proxyHost?: string, browserContext?: puppeteer.BrowserContext, runInEveryFrame?: function():void, executablePath?: string, maxLoadTimeMs?: number, extraExecutionTimeMs?: number, maxCollectionTimeMs?: number, collectorFlags?: Object.<string, boolean>}} options
+ * @param {CrawlOptions} options
  * @returns {Promise<CollectResult>}
  */
 
 async function crawl(url, options) {
     const log = options.log || (() => {});
-    const browser = options.browserContext ? null : await openBrowser(log, options.proxyHost, options.executablePath);
+    const browser = options.browserContext ? null : await openBrowser(
+        log, options.proxyHost, options.executablePath,
+        options.headless || VISUAL_DEBUG, options.devtools || VISUAL_DEBUG
+    );
     // Create a new incognito browser context.
     const context = options.browserContext || await browser.createIncognitoBrowserContext();
 
@@ -297,6 +302,8 @@ async function crawl(url, options) {
     const extraExecutionTimeMs = options.extraExecutionTimeMs || 2500;
     const maxCollectionTimeMs = options.maxCollectionTimeMs || 5000;
     const maxTotalTimeMs = (maxLoadTimeMs * 2) + extraExecutionTimeMs + maxCollectionTimeMs;
+
+    const keepOpen = options.keepOpen || VISUAL_DEBUG;
 
     try {
         data = await wait(getSiteData(context, url, {
@@ -308,14 +315,15 @@ async function crawl(url, options) {
             runInEveryFrame: options.runInEveryFrame,
             maxLoadTimeMs,
             extraExecutionTimeMs,
-            collectorFlags: options.collectorFlags
+            collectorFlags: options.collectorFlags,
+            keepOpen,
         }), maxTotalTimeMs);
     } catch(e) {
         log(chalk.red('Crawl failed'), e.message, chalk.gray(e.stack));
         throw e;
     } finally {
-        // only close the browser if it was created here and not debugging
-        if (browser && !VISUAL_DEBUG) {
+        // only close the browser if it was created here and keepOpen is false
+        if (browser && !keepOpen) {
             await context.close();
             await browser.close();
         }
@@ -325,6 +333,40 @@ async function crawl(url, options) {
 }
 
 module.exports = crawl;
+
+/**
+ * @typedef CrawlOptions
+ * @property {import('./collectors/BaseCollector')[]} [collectors]
+ * @property {function(...any):void} [log]
+ * @property {boolean} [filterOutFirstParty]
+ * @property {boolean} [emulateMobile]
+ * @property {boolean} [emulateUserAgent]
+ * @property {string} [proxyHost]
+ * @property {puppeteer.BrowserContext} [browserContext]
+ * @property {function():void} [runInEveryFrame]
+ * @property {string} [executablePath]
+ * @property {number} [maxLoadTimeMs]
+ * @property {number} [extraExecutionTimeMs]
+ * @property {number} [maxCollectionTimeMs]
+ * @property {Object.<string, boolean>} [collectorFlags]
+ * @property {boolean} [headless]
+ * @property {boolean} [devtools]
+ * @property {boolean} [keepOpen]
+ */
+
+/**
+ * @typedef GetSiteDataOptions
+ * @property {import('./collectors/BaseCollector')[]} collectors
+ * @property {function(...any):void} log
+ * @property {function(string, string):boolean} urlFilter
+ * @property {boolean} emulateMobile
+ * @property {boolean} emulateUserAgent
+ * @property {function():void} runInEveryFrame
+ * @property {number} maxLoadTimeMs
+ * @property {number} extraExecutionTimeMs
+ * @property {Object.<string, boolean>} collectorFlags
+ * @property {boolean} keepOpen
+ */
 
 /**
  * @typedef {Object} CollectResult

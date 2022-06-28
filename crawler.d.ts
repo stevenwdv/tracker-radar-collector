@@ -1,10 +1,14 @@
 export = crawl;
 /**
  * @param {URL} url
- * @param {{collectors?: import('./collectors/BaseCollector')[], log?: function(...any):void, filterOutFirstParty?: boolean, emulateMobile?: boolean, emulateUserAgent?: boolean, proxyHost?: string, browserContext?: puppeteer.BrowserContext, runInEveryFrame?: function():void, executablePath?: string, maxLoadTimeMs?: number, extraExecutionTimeMs?: number, maxCollectionTimeMs?: number, collectorFlags?: Object.<string, boolean>}} options
+ * @param {CrawlOptions} options
  * @returns {Promise<CollectResult>}
  */
-declare function crawl(url: URL, options: {
+declare function crawl(url: URL, options: CrawlOptions): Promise<CollectResult>;
+declare namespace crawl {
+    export { CrawlOptions, GetSiteDataOptions, CollectResult };
+}
+type CrawlOptions = {
     collectors?: import('./collectors/BaseCollector')[];
     log?: (...args: any[]) => void;
     filterOutFirstParty?: boolean;
@@ -20,11 +24,10 @@ declare function crawl(url: URL, options: {
     collectorFlags?: {
         [x: string]: boolean;
     };
-}): Promise<CollectResult>;
-declare namespace crawl {
-    export { CollectResult };
-}
-import puppeteer = require("puppeteer");
+    headless?: boolean;
+    devtools?: boolean;
+    keepOpen?: boolean;
+};
 type CollectResult = {
     /**
      * URL from which the crawler began the crawl (as provided by the caller)
@@ -51,3 +54,18 @@ type CollectResult = {
      */
     data: import('./helpers/collectorsList').CollectorData;
 };
+type GetSiteDataOptions = {
+    collectors: import('./collectors/BaseCollector')[];
+    log: (...args: any[]) => void;
+    urlFilter: (arg0: string, arg1: string) => boolean;
+    emulateMobile: boolean;
+    emulateUserAgent: boolean;
+    runInEveryFrame: () => void;
+    maxLoadTimeMs: number;
+    extraExecutionTimeMs: number;
+    collectorFlags: {
+        [x: string]: boolean;
+    };
+    keepOpen: boolean;
+};
+import puppeteer = require("puppeteer");
