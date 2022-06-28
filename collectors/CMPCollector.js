@@ -14,7 +14,7 @@ const consentomatic = extraRules.consentomatic;
 const rules = [
     ...autoconsent.rules,
     ...Object.keys(consentomatic).map(name => new autoconsent.ConsentOMaticCMP(`com_${name}`, consentomatic[name])),
-    ...extraRules.autoconsent.map(spec => autoconsent.createAutoCMP(spec)),
+    ...extraRules.autoconsent.map(spec => autoconsent.createAutoCMP(/** @type {import('@duckduckgo/autoconsent/lib/rules').AutoConsentCMPRule} */ (spec))),
 ];
 
 class CMPCollector extends BaseCollector {
@@ -24,7 +24,7 @@ class CMPCollector extends BaseCollector {
     }
 
     /**
-     * @param {import('./BaseCollector').CollectorInitOptions} options 
+     * @param {import('./BaseCollector').CollectorInitOptions} options
      */
     init(options) {
         this.context = options.context;
@@ -37,7 +37,7 @@ class CMPCollector extends BaseCollector {
     }
 
     /**
-     * @param {{cdpClient: import('puppeteer').CDPSession, url: string, type: import('./TargetCollector').TargetType}} targetInfo 
+     * @param {{cdpClient: import('puppeteer').CDPSession, url: string, type: import('./TargetCollector').TargetType}} targetInfo
      */
     // eslint-disable-next-line no-unused-vars
     addTarget(targetInfo) {
@@ -80,7 +80,7 @@ class CMPCollector extends BaseCollector {
 
     /**
      * Called after the crawl to retrieve the data. Can be async, can throw errors.
-     * 
+     *
      * @param {{finalUrl: string, urlFilter?: function(string):boolean}} options
      * @returns {Promise<Object>|Object}
      */
