@@ -28,10 +28,10 @@ const VISUAL_DEBUG = false;
  * @param {function(...any):void} log
  * @param {string} proxyHost
  * @param {string} executablePath path to chromium executable to use
- * @param {boolean} headless
+ * @param {boolean} headed
  * @param {boolean} devtools
  */
-function openBrowser(log, proxyHost, executablePath, headless = true, devtools = false) {
+function openBrowser(log, proxyHost, executablePath, headed = false, devtools = false) {
     /**
      * @type {import('puppeteer').BrowserLaunchArgumentOptions}
      */
@@ -42,7 +42,7 @@ function openBrowser(log, proxyHost, executablePath, headless = true, devtools =
             '--enable-features="FederatedLearningOfCohorts:update_interval/10s/minimum_history_domain_size_required/1,FlocIdSortingLshBasedComputation,InterestCohortFeaturePolicy"'
         ]
     };
-    args.headless = headless;
+    args.headless = !headed;
     args.devtools = devtools;
 
     if (proxyHost) {
@@ -291,7 +291,7 @@ async function crawl(url, options) {
     const log = options.log || (() => {});
     const browser = options.browserContext ? null : await openBrowser(
         log, options.proxyHost, options.executablePath,
-        options.headless || VISUAL_DEBUG, options.devtools || VISUAL_DEBUG
+        options.headed || VISUAL_DEBUG, options.devtools || VISUAL_DEBUG
     );
     // Create a new incognito browser context.
     const context = options.browserContext || await browser.createIncognitoBrowserContext();
@@ -349,7 +349,7 @@ module.exports = crawl;
  * @property {number} [extraExecutionTimeMs]
  * @property {number} [maxCollectionTimeMs]
  * @property {Object.<string, boolean>} [collectorFlags]
- * @property {boolean} [headless]
+ * @property {boolean} [headed]
  * @property {boolean} [devtools]
  * @property {boolean} [keepOpen]
  */

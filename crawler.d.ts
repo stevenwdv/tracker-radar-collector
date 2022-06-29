@@ -24,7 +24,7 @@ type CrawlOptions = {
     collectorFlags?: {
         [x: string]: boolean;
     };
-    headless?: boolean;
+    headed?: boolean;
     devtools?: boolean;
     keepOpen?: boolean;
 };
