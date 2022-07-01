@@ -132,14 +132,6 @@ async function getSiteData(context, url, {
         const simpleTarget = {url: target.url(), type: target.type(), cdpClient};
         targets.push(simpleTarget);
 
-        try {
-            // we have to pause new targets and attach to them as soon as they are created not to miss any data
-            await cdpClient.send('Target.setAutoAttach', {autoAttach: true, waitForDebuggerOnStart: true});
-        } catch (e) {
-            log(chalk.yellow(`Failed to set "${target.url()}" up.`), chalk.gray(e.message), chalk.gray(e.stack));
-            return;
-        }
-
         for (let collector of collectors) {
             try {
                 // eslint-disable-next-line no-await-in-loop
@@ -147,15 +139,6 @@ async function getSiteData(context, url, {
             } catch (e) {
                 log(chalk.yellow(`${collector.id()} failed to attach to "${target.url()}"`), chalk.gray(e.message), chalk.gray(e.stack));
             }
-        }
-
-        try {
-            // resume target when all collectors are ready
-            await cdpClient.send('Runtime.enable');
-            await cdpClient.send('Runtime.runIfWaitingForDebugger');
-        } catch (e) {
-            log(chalk.yellow(`Failed to resume target "${target.url()}"`), chalk.gray(e.message), chalk.gray(e.stack));
-            return;
         }
 
         log(`${target.url()} (${target.type()}) context initiated in ${timer.getElapsedTime()}s`);
@@ -166,15 +149,12 @@ async function getSiteData(context, url, {
 
     // optional function that should be run on every page (and subframe) in the browser context
     if (runInEveryFrame) {
-        page.evaluateOnNewDocument(runInEveryFrame);
+        await page.evaluateOnNewDocument(runInEveryFrame);
     }
 
     // We are creating CDP connection before page target is created, if we create it only after
     // new target is created we will miss some requests, API calls, etc.
     const cdpClient = await page.target().createCDPSession();
-
-    // without this, we will miss the initial request for the web worker or service worker file
-    await cdpClient.send('Target.setAutoAttach', {autoAttach: true, waitForDebuggerOnStart: true});
 
     const initPageTimer = createTimer();
     for (let collector of collectors) {
@@ -188,10 +168,10 @@ async function getSiteData(context, url, {
     log(`page context initiated in ${initPageTimer.getElapsedTime()}s`);
 
     if (emulateUserAgent) {
-        page.setUserAgent(emulateMobile ? MOBILE_USER_AGENT : DEFAULT_USER_AGENT);
+        await page.setUserAgent(emulateMobile ? MOBILE_USER_AGENT : DEFAULT_USER_AGENT);
     }
 
-    page.setViewport(emulateMobile ? MOBILE_VIEWPORT : DEFAULT_VIEWPORT);
+    await page.setViewport(emulateMobile ? MOBILE_VIEWPORT : DEFAULT_VIEWPORT);
 
     // if any prompts open on page load, they'll make the page hang unless closed
     page.on('dialog', dialog => dialog.dismiss());
