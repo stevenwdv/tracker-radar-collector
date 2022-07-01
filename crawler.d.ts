@@ -27,6 +27,7 @@ type CrawlOptions = {
     headed?: boolean;
     devtools?: boolean;
     keepOpen?: boolean;
+    throwCollectorErrors?: boolean;
 };
 type CollectResult = {
     /**
@@ -67,5 +68,6 @@ type GetSiteDataOptions = {
         [x: string]: boolean;
     };
     keepOpen: boolean;
+    throwCollectorErrors: boolean;
 };
 import puppeteer = require("puppeteer");

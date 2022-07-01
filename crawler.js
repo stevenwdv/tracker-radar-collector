@@ -51,6 +51,7 @@ function openBrowser(log, proxyHost, executablePath, headed = false, devtools = 
             url = new URL(proxyHost);
         } catch(e) {
             log('Invalid proxy URL');
+            throw e;
         }
 
         args.args.push(`--proxy-server=${proxyHost}`);
@@ -82,6 +83,7 @@ async function getSiteData(context, url, {
     extraExecutionTimeMs,
     collectorFlags,
     keepOpen,
+    throwCollectorErrors,
 }) {
     const testStarted = Date.now();
 
@@ -106,10 +108,16 @@ async function getSiteData(context, url, {
             log(`${collector.id()} init took ${timer.getElapsedTime()}s`);
         } catch (e) {
             log(chalk.yellow(`${collector.id()} init failed`), chalk.gray(e.message), chalk.gray(e.stack));
+            if (throwCollectorErrors) {throw e;}
         }
     }
 
     let pageTargetCreated = false;
+
+    /**
+     * @type {any[]}
+     */
+    const listenerErrors = [];
 
     // initiate collectors for all contexts (main page, web worker, service worker etc.)
     context.on('targetcreated', async target => {
@@ -138,6 +146,9 @@ async function getSiteData(context, url, {
                 await collector.addTarget(simpleTarget);
             } catch (e) {
                 log(chalk.yellow(`${collector.id()} failed to attach to "${target.url()}"`), chalk.gray(e.message), chalk.gray(e.stack));
+                if (throwCollectorErrors) {
+                    listenerErrors.push(e);
+                }
             }
         }
 
@@ -163,6 +174,7 @@ async function getSiteData(context, url, {
             await collector.addTarget({url: url.toString(), type: 'page', cdpClient});
         } catch (e) {
             log(chalk.yellow(`${collector.id()} failed to attach to page`), chalk.gray(e.message), chalk.gray(e.stack));
+            if (throwCollectorErrors) {throw e;}
         }
     }
     log(`page context initiated in ${initPageTimer.getElapsedTime()}s`);
@@ -224,6 +236,17 @@ async function getSiteData(context, url, {
         } catch (e) {
             log(chalk.yellow(`getting ${collector.id()} data failed`), chalk.gray(e.message), chalk.gray(e.stack));
             data[collector.id()] = null;
+            if (throwCollectorErrors) {throw e;}
+        }
+    }
+
+    if (listenerErrors.length) {
+        if ('AggregateError' in global) {
+            // @ts-ignore AggregateError not defined
+            // eslint-disable-next-line no-undef
+            throw new AggregateError(listenerErrors, 'Errors in collectors during crawl');
+        } else {
+            throw listenerErrors[0];
         }
     }
 
@@ -231,7 +254,7 @@ async function getSiteData(context, url, {
         try {
             // eslint-disable-next-line no-await-in-loop
             await target.cdpClient.detach();
-        } catch (e) {
+        } catch (ignore) {
             // we don't care that much because in most cases an error here means that target already detached
         }
     }
@@ -297,6 +320,7 @@ async function crawl(url, options) {
             extraExecutionTimeMs,
             collectorFlags: options.collectorFlags,
             keepOpen,
+            throwCollectorErrors: options.throwCollectorErrors,
         }), maxTotalTimeMs);
     } catch(e) {
         log(chalk.red('Crawl failed'), e.message, chalk.gray(e.stack));
@@ -332,6 +356,7 @@ module.exports = crawl;
  * @property {boolean} [headed]
  * @property {boolean} [devtools]
  * @property {boolean} [keepOpen]
+ * @property {boolean} [throwCollectorErrors]
  */
 
 /**
@@ -346,6 +371,7 @@ module.exports = crawl;
  * @property {number} extraExecutionTimeMs
  * @property {Object.<string, boolean>} collectorFlags
  * @property {boolean} keepOpen
+ * @property {boolean} throwCollectorErrors
  */
 
 /**
