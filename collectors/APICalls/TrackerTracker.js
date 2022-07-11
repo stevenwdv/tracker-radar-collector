@@ -201,6 +201,14 @@ class TrackerTracker {
     }
 
     /**
+     * @param {string} stack
+     * @returns {string[]}
+     */
+    _getStackFrames(stack) {
+        return [...stack.matchAll(/^\s*at\s+(.+)$/mg)].map(m => m[1]);
+    }
+
+    /**
      * @param {string} breakpointName
      * @returns {import('./breakpoints').MethodBreakpoint|import('./breakpoints').PropertyBreakpoint}
      */
@@ -226,7 +234,7 @@ class TrackerTracker {
 
     /**
      * @param {{payload: string, description: string, executionContextId: number}} params
-     * @returns {{description: string, source: string, saveArguments: boolean, arguments: string[], stack?: string, custom?: any}}
+     * @returns {{description: string, source: string, saveArguments: boolean, arguments: string[], stack?: string[], custom?: any}}
      */
     processDebuggerPause(params) {
         let payload = null;
@@ -263,7 +271,7 @@ class TrackerTracker {
         // this._log('breakpoint', params, script);
 
         /**
-         * @type {{description: string, source: string, saveArguments: boolean, arguments: string[], stack?: string, custom?: any}}
+         * @type {{description: string, source: string, saveArguments: boolean, arguments: string[], stack?: string[], custom?: any}}
          */
         const result = {
             description: payload.description,
@@ -272,7 +280,7 @@ class TrackerTracker {
             source: script,
         };
         if (payload.fullStack) {
-            result.stack = payload.stack;
+            result.stack = this._getStackFrames(payload.stack);
         }
         if (payload.custom !== undefined) {
             result.custom = payload.custom;

@@ -87,7 +87,7 @@ type SavedCall = {
     /**
      * - full stack
      */
-    stack?: string | undefined;
+    stack?: string[];
     /**
      * - custom captured data
      */
