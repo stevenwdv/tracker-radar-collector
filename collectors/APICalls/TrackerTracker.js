@@ -57,16 +57,17 @@ class TrackerTracker {
 
     /**
      * @param {string} expression
-     * @param {string} condition
+     * @param {(string | function(any): boolean)} condition
      * @param {string} description
      * @param {boolean} saveArguments
      * @param {CDPContextId} contextId
      * @param {boolean} fullStack
-     * @param {(string | function(any): any)} customCapture?
+     * @param {boolean} pauseDebugger
+     * @param {(string | function(any): any)} customCapture
      */
     async _addBreakpoint(
         expression, condition, description, contextId, saveArguments,
-        fullStack, customCapture = () => undefined
+        fullStack, pauseDebugger, customCapture
     ) {
         try {
             /**
@@ -83,18 +84,17 @@ class TrackerTracker {
                 throw new Error('API unavailable in given context.');
             }
 
-            if (!(customCapture instanceof Function)) {
-                // Check syntax (input is trusted)
+            const customCaptureFun = customCapture instanceof Function
+                ? customCapture
                 // eslint-disable-next-line no-new-func
-                Function(String(customCapture));
-            }
+                : Function(`return (${String(customCapture)});`);
 
             let conditionScript = `
                 const data = {
-                    description: '${description}',
-                    stack: (new Error()).stack,
+                    description: ${JSON.stringify(description)},
+                    stack: Error().stack,
                     fullStack: ${fullStack},
-                    custom: (${String(customCapture)})(this)
+                    custom: (${String(customCaptureFun)}).call(this, this),
                 };
             `;
 
@@ -107,13 +107,18 @@ class TrackerTracker {
 
             conditionScript += `
                 window.registerAPICall(JSON.stringify(data));
-                false;
+                ${pauseDebugger}
             `;
 
-            // if breakpoint comes with an condition only count it when this condition is met
+            // if breakpoint comes with a condition only count it when this condition is met
             if (condition) {
+                const conditionFun = condition instanceof Function
+                    ? condition
+                    // eslint-disable-next-line no-new-func
+                    : Function(`return (${String(condition)});`);
+
                 conditionScript = `
-                    if (!!(${condition})) {
+                    if (!!(${conditionFun}).call(this, this)) {
                         ${conditionScript}
                     }
                 `;
@@ -147,7 +152,10 @@ class TrackerTracker {
                 const propPromises = props.map(async prop => {
                     const expression = `Reflect.getOwnPropertyDescriptor(${obj}, '${prop.name}').${prop.setter === true ? 'set' : 'get'}`;
                     const description = prop.description || `${obj}.${prop.name}`;
-                    await this._addBreakpoint(expression, prop.condition, description, contextId, Boolean(prop.saveArguments), prop.fullStack, prop.customCapture);
+                    await this._addBreakpoint(
+                        expression, prop.condition, description, contextId,
+                        prop.saveArguments, prop.fullStack, prop.pauseDebugger, prop.customCapture
+                    );
                 });
 
                 await Promise.all(propPromises);
@@ -155,7 +163,10 @@ class TrackerTracker {
                 const methodPromises = methods.map(async method => {
                     const expression = `Reflect.getOwnPropertyDescriptor(${obj}, '${method.name}').value`;
                     const description = method.description || `${obj}.${method.name}`;
-                    await this._addBreakpoint(expression, method.condition, description, contextId, Boolean(method.saveArguments), method.fullStack, method.customCapture);
+                    await this._addBreakpoint(
+                        expression, method.condition, description, contextId,
+                        method.saveArguments, method.fullStack, method.pauseDebugger, method.customCapture
+                    );
                 });
 
                 await Promise.all(methodPromises);

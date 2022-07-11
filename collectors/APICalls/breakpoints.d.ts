@@ -28,7 +28,7 @@ type MethodBreakpoint = {
     /**
      * - additional condition that has to be truthy for the breakpoint to fire
      */
-    condition?: string | undefined;
+    condition?: (string | ((arg0: any) => boolean)) | undefined;
     /**
      * - save arguments of each call (defaults to false)
      */
@@ -37,6 +37,10 @@ type MethodBreakpoint = {
      * save full call stack
      */
     fullStack?: boolean | undefined;
+    /**
+     * pause debugger on hit
+     */
+    pauseDebugger?: boolean | undefined;
     /**
      * custom capturing function
      */
@@ -58,7 +62,7 @@ type PropertyBreakpoint = {
     /**
      * - additional condition that has to be truthy for the breakpoint to fire
      */
-    condition?: string | undefined;
+    condition?: (string | ((arg0: any) => boolean)) | undefined;
     /**
      * - save arguments of each call (defaults to false)
      */
@@ -71,6 +75,10 @@ type PropertyBreakpoint = {
      * save full call stack
      */
     fullStack?: boolean | undefined;
+    /**
+     * pause debugger on hit
+     */
+    pauseDebugger?: boolean | undefined;
     /**
      * custom capturing function
      */

@@ -39,14 +39,15 @@ declare class TrackerTracker {
     setMainURL(url: string): void;
     /**
      * @param {string} expression
-     * @param {string} condition
+     * @param {(string | function(any): boolean)} condition
      * @param {string} description
      * @param {boolean} saveArguments
      * @param {CDPContextId} contextId
      * @param {boolean} fullStack
-     * @param {(string | function(any): any)} customCapture?
+     * @param {boolean} pauseDebugger
+     * @param {(string | function(any): any)} customCapture
      */
-    _addBreakpoint(expression: string, condition: string, description: string, contextId: CDPContextId, saveArguments: boolean, fullStack: boolean, customCapture?: (string | ((arg0: any) => any))): Promise<void>;
+    _addBreakpoint(expression: string, condition: (string | ((arg0: any) => boolean)), description: string, contextId: CDPContextId, saveArguments: boolean, fullStack: boolean, pauseDebugger: boolean, customCapture: (string | ((arg0: any) => any))): Promise<void>;
     /**
      * @param {CDPContextId} contextId
      */
