@@ -301,10 +301,10 @@ async function crawl(url, options) {
 
     let data = null;
 
-    const maxLoadTimeMs = options.maxLoadTimeMs || 30000;
-    const extraExecutionTimeMs = options.extraExecutionTimeMs || 2500;
-    const maxCollectionTimeMs = options.maxCollectionTimeMs || 5000;
-    const maxTotalTimeMs = (maxLoadTimeMs * 2) + extraExecutionTimeMs + maxCollectionTimeMs;
+    const maxLoadTimeMs = options.maxLoadTimeMs === undefined ? 30000 : options.maxLoadTimeMs;
+    const extraExecutionTimeMs = options.extraExecutionTimeMs === undefined ? 2500 : options.extraExecutionTimeMs;
+    const maxCollectionTimeMs = options.maxCollectionTimeMs === undefined ? 5000 : options.maxCollectionTimeMs;
+    const maxTotalTimeMs = maxCollectionTimeMs ? (maxLoadTimeMs * 2) + extraExecutionTimeMs + maxCollectionTimeMs : 0;
 
     const keepOpen = options.keepOpen || VISUAL_DEBUG;
 
@@ -342,21 +342,21 @@ module.exports = crawl;
  * @typedef CrawlOptions
  * @property {import('./collectors/BaseCollector')[]} [collectors]
  * @property {function(...any):void} [log]
- * @property {boolean} [filterOutFirstParty]
- * @property {boolean} [emulateMobile]
- * @property {boolean} [emulateUserAgent]
- * @property {string} [proxyHost]
- * @property {puppeteer.BrowserContext} [browserContext]
- * @property {function():void} [runInEveryFrame]
- * @property {string} [executablePath]
- * @property {number} [maxLoadTimeMs]
- * @property {number} [extraExecutionTimeMs]
- * @property {number} [maxCollectionTimeMs]
- * @property {Object.<string, boolean>} [collectorFlags]
- * @property {boolean} [headed]
- * @property {boolean} [devtools]
- * @property {boolean} [keepOpen]
- * @property {boolean} [throwCollectorErrors]
+ * @property {boolean=} filterOutFirstParty
+ * @property {boolean=} emulateMobile
+ * @property {boolean=} emulateUserAgent
+ * @property {string=} proxyHost
+ * @property {puppeteer.BrowserContext=} browserContext
+ * @property {function():void=} runInEveryFrame
+ * @property {string=} executablePath
+ * @property {number=} maxLoadTimeMs
+ * @property {number=} extraExecutionTimeMs
+ * @property {number=} maxCollectionTimeMs 0 to disable overall timeout
+ * @property {Object.<string, boolean>=} collectorFlags
+ * @property {boolean=} headed
+ * @property {boolean=} devtools
+ * @property {boolean=} keepOpen
+ * @property {boolean=} throwCollectorErrors
  */
 
 /**
