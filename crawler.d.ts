@@ -11,23 +11,26 @@ declare namespace crawl {
 type CrawlOptions = {
     collectors?: import('./collectors/BaseCollector')[];
     log?: (...args: any[]) => void;
-    filterOutFirstParty?: boolean;
-    emulateMobile?: boolean;
-    emulateUserAgent?: boolean;
-    proxyHost?: string;
-    browserContext?: puppeteer.BrowserContext;
-    runInEveryFrame?: () => void;
-    executablePath?: string;
-    maxLoadTimeMs?: number;
-    extraExecutionTimeMs?: number;
-    maxCollectionTimeMs?: number;
+    filterOutFirstParty?: boolean | undefined;
+    emulateMobile?: boolean | undefined;
+    emulateUserAgent?: boolean | undefined;
+    proxyHost?: string | undefined;
+    browserContext?: puppeteer.BrowserContext | undefined;
+    runInEveryFrame?: (() => void) | undefined;
+    executablePath?: string | undefined;
+    maxLoadTimeMs?: number | undefined;
+    extraExecutionTimeMs?: number | undefined;
+    /**
+     * 0 to disable overall timeout
+     */
+    maxCollectionTimeMs?: number | undefined;
     collectorFlags?: {
         [x: string]: boolean;
-    };
-    headed?: boolean;
-    devtools?: boolean;
-    keepOpen?: boolean;
-    throwCollectorErrors?: boolean;
+    } | undefined;
+    headed?: boolean | undefined;
+    devtools?: boolean | undefined;
+    keepOpen?: boolean | undefined;
+    throwCollectorErrors?: boolean | undefined;
 };
 type CollectResult = {
     /**
