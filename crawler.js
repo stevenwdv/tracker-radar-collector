@@ -107,7 +107,7 @@ async function getSiteData(context, url, {
             await collector.init(collectorOptions);
             log(`${collector.id()} init took ${timer.getElapsedTime()}s`);
         } catch (e) {
-            log(chalk.yellow(`${collector.id()} init failed`), chalk.gray(e.message), chalk.gray(e.stack));
+            log(chalk.yellow(`${collector.id()} init failed`), e);
             if (throwCollectorErrors) {throw e;}
         }
     }
@@ -133,7 +133,7 @@ async function getSiteData(context, url, {
         try {
             cdpClient = await target.createCDPSession();
         } catch (e) {
-            log(chalk.yellow(`Failed to connect to "${target.url()}"`), chalk.gray(e.message), chalk.gray(e.stack));
+            log(chalk.yellow(`Failed to connect to "${target.url()}"`), e);
             return;
         }
 
@@ -145,7 +145,7 @@ async function getSiteData(context, url, {
                 // eslint-disable-next-line no-await-in-loop
                 await collector.addTarget(simpleTarget);
             } catch (e) {
-                log(chalk.yellow(`${collector.id()} failed to attach to "${target.url()}"`), chalk.gray(e.message), chalk.gray(e.stack));
+                log(chalk.yellow(`${collector.id()} failed to attach to "${target.url()}"`), e);
                 if (throwCollectorErrors) {
                     listenerErrors.push(e);
                 }
@@ -173,7 +173,7 @@ async function getSiteData(context, url, {
             // eslint-disable-next-line no-await-in-loop
             await collector.addTarget({url: url.toString(), type: 'page', cdpClient});
         } catch (e) {
-            log(chalk.yellow(`${collector.id()} failed to attach to page`), chalk.gray(e.message), chalk.gray(e.stack));
+            log(chalk.yellow(`${collector.id()} failed to attach to page`), e);
             if (throwCollectorErrors) {throw e;}
         }
     }
@@ -189,7 +189,7 @@ async function getSiteData(context, url, {
     page.on('dialog', dialog => dialog.dismiss());
 
     // catch and report crash errors
-    page.on('error', e => log(chalk.red(e.message)));
+    page.on('error', e => log(chalk.red('error in page'), String(e)));
 
     let timeout = false;
 
@@ -234,7 +234,7 @@ async function getSiteData(context, url, {
             data[collector.id()] = collectorData;
             log(`getting ${collector.id()} data took ${getDataTimer.getElapsedTime()}s`);
         } catch (e) {
-            log(chalk.yellow(`getting ${collector.id()} data failed`), chalk.gray(e.message), chalk.gray(e.stack));
+            log(chalk.yellow(`getting ${collector.id()} data failed`), e);
             data[collector.id()] = null;
             if (throwCollectorErrors) {throw e;}
         }
@@ -323,7 +323,7 @@ async function crawl(url, options) {
             throwCollectorErrors: options.throwCollectorErrors,
         }), maxTotalTimeMs);
     } catch(e) {
-        log(chalk.red('Crawl failed'), e.message, chalk.gray(e.stack));
+        log(chalk.red('Crawl failed'), e);
         throw e;
     } finally {
         // only close the browser if it was created here and keepOpen is false
