@@ -1,3 +1,4 @@
+import puppeteer = require("puppeteer");
 import crawler = require("./crawler");
 import crawlerConductor = require("./crawlerConductor");
 import breakpoints = require("./collectors/APICalls/breakpoints");
@@ -9,4 +10,4 @@ import TraceCollector = require("./collectors/TraceCollector");
 import ScreenshotCollector = require("./collectors/ScreenshotCollector");
 import CMPCollector = require("./collectors/CMPCollector");
 import BaseCollector = require("./collectors/BaseCollector");
-export { crawler, crawlerConductor, breakpoints, RequestCollector, APICallCollector, CookieCollector, TargetCollector, TraceCollector, ScreenshotCollector, CMPCollector, BaseCollector };
+export { puppeteer, crawler, crawlerConductor, breakpoints, RequestCollector, APICallCollector, CookieCollector, TargetCollector, TraceCollector, ScreenshotCollector, CMPCollector, BaseCollector };

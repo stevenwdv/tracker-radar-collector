@@ -1,3 +1,5 @@
+const puppeteer = require('puppeteer');
+
 const crawlerConductor = require('./crawlerConductor');
 const crawler = require('./crawler');
 const breakpoints = require('./collectors/APICalls/breakpoints');
@@ -14,6 +16,7 @@ const CMPCollector = require('./collectors/CMPCollector');
 // reexport main pieces of code so that they can be easily imported when this project is used as a dependency
 // e.g. `const {crawlerConductor} = require('3p-crawler');`
 module.exports = {
+    puppeteer,
     crawler,
     crawlerConductor,
     breakpoints,
