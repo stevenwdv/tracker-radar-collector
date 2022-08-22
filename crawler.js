@@ -133,7 +133,7 @@ async function getSiteData(context, url, {
         try {
             cdpClient = await target.createCDPSession();
         } catch (e) {
-            log(chalk.yellow(`Failed to connect to "${target.url()}"`), e);
+            log(chalk.yellow(`Failed to connect to ${target.type()} "${target.url()}"`), e);
             return;
         }
 
@@ -145,7 +145,7 @@ async function getSiteData(context, url, {
                 // eslint-disable-next-line no-await-in-loop
                 await collector.addTarget(simpleTarget);
             } catch (e) {
-                log(chalk.yellow(`${collector.id()} failed to attach to "${target.url()}"`), e);
+                log(chalk.yellow(`${collector.id()} failed to attach to ${target.type()} "${target.url()}"`), e);
                 if (throwCollectorErrors) {
                     listenerErrors.push(e);
                 }
