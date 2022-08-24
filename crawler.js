@@ -300,7 +300,10 @@ async function crawl(url, options) {
     const context = options.browserContext || await browser.createIncognitoBrowserContext();
     if (!options.browserContext) {
         // Close non-incognito window
-        await (await browser.defaultBrowserContext().pages())[0].close();
+        context.once(
+            'targetcreated',
+            () => browser.defaultBrowserContext().pages().then(([p]) => p.close())
+        );
     }
 
     let data = null;
