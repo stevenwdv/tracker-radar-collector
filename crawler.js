@@ -298,6 +298,10 @@ async function crawl(url, options) {
     );
     // Create a new incognito browser context.
     const context = options.browserContext || await browser.createIncognitoBrowserContext();
+    if (!options.browserContext) {
+        // Close non-incognito window
+        await (await browser.defaultBrowserContext().pages())[0].close();
+    }
 
     let data = null;
 
