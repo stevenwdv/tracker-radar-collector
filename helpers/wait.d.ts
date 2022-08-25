@@ -1,7 +1,8 @@
 export = wait;
 /**
- * @param {Promise<any>} promise
+ * @template T
+ * @param {Promise<T>} promise
  * @param {number} maxMs max running time, 0 to disable timeout
- * @returns {Promise<any>}
+ * @returns {Promise<T>}
  */
-declare function wait(promise: Promise<any>, maxMs: number): Promise<any>;
+declare function wait<T>(promise: Promise<T>, maxMs: number): Promise<T>;
