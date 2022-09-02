@@ -1,5 +1,5 @@
 /* eslint-disable max-lines */
-const {getAllInitiators} = require('../helpers/initiators');
+const {getAllInitiators, getStack} = require('../helpers/initiators');
 const {filterHeaders, normalizeHeaders} = require('../helpers/headers');
 const BaseCollector = require('./BaseCollector');
 
@@ -380,6 +380,7 @@ class RequestCollector extends BaseCollector {
                 redirectedTo: request.redirectedTo,
                 redirectedFrom: request.redirectedFrom,
                 initiators: Array.from(getAllInitiators(request.initiator)),
+                stack: getStack(request.initiator),
                 time: (request.startTime && request.endTime) ? (request.endTime - request.startTime) : undefined,
                 wallTime: request.wallTime,
                 postData: request.postData
@@ -395,6 +396,7 @@ module.exports = RequestCollector;
  * @property {HttpMethod=} method
  * @property {ResourceType} type
  * @property {string[]=} initiators
+ * @property {string[]=} stack
  * @property {string=} redirectedFrom
  * @property {string=} redirectedTo
  * @property {number=} status

@@ -2,7 +2,7 @@ const {getAllInitiators} = require('../../helpers/initiators');
 const assert = require('assert');
 
 const input = {
-    type: 'bla',
+    type: /**@type {'script'}*/('script'),
     url: 'https://example.com/a.js',
     lineNumber: 1,
     stack: {

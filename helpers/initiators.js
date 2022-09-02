@@ -1,5 +1,5 @@
 /**
- * @param {{ callFrames: StackFrame[]; parent: any; }} stack
+ * @param {import('puppeteer').Protocol.Runtime.StackTrace} stack
  * @returns {string[]}
  */
 function getInitiatorsFromStack(stack) {
@@ -48,23 +48,33 @@ function getAllInitiators(initiator) {
     return allInitiators;
 }
 
+/**
+ * @param {import('puppeteer').Protocol.Runtime.StackTrace} trace
+ * @return {Generator<string, void, undefined>}
+ */
+function *getStackFromTrace(trace) {
+    for (const frame of trace.callFrames) {
+        yield `${frame.functionName} @${frame.url}:${frame.lineNumber}:${frame.columnNumber}`;
+    }
+    if (trace.parent) {
+        yield* getStackFromTrace(trace.parent);
+    }
+}
+
+/**
+ * @param {RequestInitiator} initiator
+ * @return {?string[]}
+ */
+function getStack(initiator) {
+    if (!initiator.stack) {return null;}
+    return [...getStackFromTrace(initiator.stack)];
+}
+
 module.exports = {
-    getAllInitiators
+    getAllInitiators,
+    getStack,
 };
 
 /**
- * @typedef {object} RequestInitiator
- * @property {string} type
- * @property {{callFrames: StackFrame[], parent: object}=} stack
- * @property {string=} url
- * @property {number=} lineNumber
- */
-
-/**
- * @typedef {object} StackFrame
- * @property {string} functionName
- * @property {string} scriptId
- * @property {string} url
- * @property {number} lineNumber
- * @property {number} columnNumber
+ * @typedef {import('puppeteer').Protocol.Network.Initiator} RequestInitiator
  */

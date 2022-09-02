@@ -181,6 +181,7 @@ type RequestData = {
     method?: HttpMethod | undefined;
     type: ResourceType;
     initiators?: string[] | undefined;
+    stack?: string[] | undefined;
     redirectedFrom?: string | undefined;
     redirectedTo?: string | undefined;
     status?: number | undefined;
