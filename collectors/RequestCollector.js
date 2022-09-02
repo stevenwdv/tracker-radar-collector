@@ -114,7 +114,7 @@ class RequestCollector extends BaseCollector {
         let initiator = data.initiator;
         const url = request.url;
         const method = request.method;
-        let postData = method === "POST" ? request.postData : "";
+        let postData = method === 'POST' ? request.postData : '';
 
         // for CORS requests initiator is set incorrectly to 'parser', thankfully we can get proper initiator
         // from the corresponding OPTIONS request
@@ -132,7 +132,7 @@ class RequestCollector extends BaseCollector {
         /**
          * @type {InternalRequestData}
          */
-        const requestData = {id, url, method, type, initiator, startTime, wallTime, postData};
+        const requestData = {id, url, method, type, initiator, startTime, wallTime: wallTime * 1e3, postData};
 
         // if request A gets redirected to B which gets redirected to C chrome will produce 4 events:
         // requestWillBeSent(A) requestWillBeSent(B) requestWillBeSent(C) responseReceived()
@@ -392,21 +392,21 @@ module.exports = RequestCollector;
 /**
  * @typedef RequestData
  * @property {string} url
- * @property {HttpMethod} method
+ * @property {HttpMethod=} method
  * @property {ResourceType} type
  * @property {string[]=} initiators
  * @property {string=} redirectedFrom
  * @property {string=} redirectedTo
  * @property {number=} status
- * @property {string} remoteIPAddress
- * @property {object} requestHeaders
- * @property {object} responseHeaders
+ * @property {string=} remoteIPAddress
+ * @property {Object<string,string>=} requestHeaders
+ * @property {Object<string,string>=} responseHeaders
  * @property {string=} responseBodyHash
  * @property {string=} postData
  * @property {string} failureReason
  * @property {number=} size in bytes
  * @property {number=} time duration in seconds
- * @property {number=} wallTime of the request in seconds since the unix epoch
+ * @property {number=} wallTime of the request in milliseconds since the unix epoch
  */
 
 /**

@@ -178,15 +178,19 @@ type CDPResponse = {
 };
 type RequestData = {
     url: string;
-    method: HttpMethod;
+    method?: HttpMethod | undefined;
     type: ResourceType;
     initiators?: string[] | undefined;
     redirectedFrom?: string | undefined;
     redirectedTo?: string | undefined;
     status?: number | undefined;
-    remoteIPAddress: string;
-    requestHeaders: object;
-    responseHeaders: object;
+    remoteIPAddress?: string | undefined;
+    requestHeaders?: {
+        [x: string]: string;
+    } | undefined;
+    responseHeaders?: {
+        [x: string]: string;
+    } | undefined;
     responseBodyHash?: string | undefined;
     postData?: string | undefined;
     failureReason: string;
@@ -199,7 +203,7 @@ type RequestData = {
      */
     time?: number | undefined;
     /**
-     * of the request in seconds since the unix epoch
+     * of the request in milliseconds since the unix epoch
      */
     wallTime?: number | undefined;
 };
