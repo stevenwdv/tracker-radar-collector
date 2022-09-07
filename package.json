@@ -8,7 +8,8 @@
   "scripts": {
     "crawl": "node ./cli/crawl-cli",
     "test": "npm run lint && tsc --noEmit --emitDeclarationOnly false && npm run unit",
-    "unit": "node ./tests/runTests.js",
+    "unit": "node ./tests/runTests.js && npm run mocha",
+    "mocha": "mocha ./tests/**/*.mocha.js",
     "lint": "eslint *.js cli/ collectors/ helpers/ post-processing/ tests/ reporters/",
     "lint-fix": "npm run lint -- --fix",
     "remove-declarations": "bash -c 'shopt -s extglob && shopt -s globstar && `rm -f *.d.ts !(node_modules)/**/*.d.ts`'",
@@ -26,16 +27,20 @@
   },
   "devDependencies": {
     "@types/async": "^3.2.15",
+    "@types/mocha": "^9.1.1",
     "@types/mockery": "^1.4.30",
     "@types/node": "^17.0.45",
     "@types/progress": "^2.0.5",
     "@types/stack-utils": "^2.0.1",
     "eslint": "^8.22.0",
+    "eslint-plugin-mocha": "^10.0.5",
+    "mocha": "^10.0.0",
+    "mockery": "^2.1.0",
     "pre-push": "^0.1.3",
     "typescript": "^4.8.2"
   },
   "dependencies": {
-    "@duckduckgo/autoconsent": "^1.0.8",
+    "@duckduckgo/autoconsent": "^2.1.1",
     "async": "^3.2.4",
     "chalk": "^2.4.2",
     "clickhouse": "^2.6.0",

@@ -41,9 +41,10 @@ declare class APICallCollector extends BaseCollector {
     }): Promise<void>;
     /**
      * @param {TrackerTracker} trackerTracker
-     * @param {{payload: string, description: string, executionContextId: number}} params
+     * @param {{name: string, payload: string, description: string, executionContextId: number}} params
      */
     onBindingCalled(trackerTracker: TrackerTracker, params: {
+        name: string;
         payload: string;
         description: string;
         executionContextId: number;

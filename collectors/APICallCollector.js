@@ -71,9 +71,12 @@ class APICallCollector extends BaseCollector {
 
     /**
      * @param {TrackerTracker} trackerTracker
-     * @param {{payload: string, description: string, executionContextId: number}} params
+     * @param {{name: string, payload: string, description: string, executionContextId: number}} params
      */
     onBindingCalled(trackerTracker, params) {
+        if (params.name !== 'registerAPICall') {
+            return;
+        }
         const breakpoint = trackerTracker.processDebuggerPause(params);
 
         if (breakpoint && breakpoint.source && breakpoint.description) {

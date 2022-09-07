@@ -25,7 +25,7 @@ type CrawlOptions = {
      */
     maxCollectionTimeMs?: number | undefined;
     collectorFlags?: {
-        [x: string]: boolean;
+        [x: string]: string;
     } | undefined;
     headed?: boolean | undefined;
     devtools?: boolean | undefined;
@@ -68,7 +68,7 @@ type GetSiteDataOptions = {
     maxLoadTimeMs: number;
     extraExecutionTimeMs: number;
     collectorFlags: {
-        [x: string]: boolean;
+        [x: string]: string;
     };
     keepOpen: boolean;
     throwCollectorErrors: boolean;

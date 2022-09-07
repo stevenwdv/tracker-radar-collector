@@ -359,7 +359,7 @@ module.exports = crawl;
  * @property {number=} maxLoadTimeMs
  * @property {number=} extraExecutionTimeMs
  * @property {number=} maxCollectionTimeMs 0 to disable overall timeout
- * @property {Object.<string, boolean>=} collectorFlags
+ * @property {Object.<string, string>=} collectorFlags
  * @property {boolean=} headed
  * @property {boolean=} devtools
  * @property {boolean=} keepOpen
@@ -376,7 +376,7 @@ module.exports = crawl;
  * @property {function():void} runInEveryFrame
  * @property {number} maxLoadTimeMs
  * @property {number} extraExecutionTimeMs
- * @property {Object.<string, boolean>} collectorFlags
+ * @property {Object.<string, string>} collectorFlags
  * @property {boolean} keepOpen
  * @property {boolean} throwCollectorErrors
  */

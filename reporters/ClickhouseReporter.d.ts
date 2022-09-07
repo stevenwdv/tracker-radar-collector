@@ -8,8 +8,8 @@ declare class ClickhouseReporter extends BaseReporter {
         pages: any[];
         requests: any[];
         elements: any[];
-        cmps: any[];
         apiSavedCalls: any[];
+        cmps: any[];
         apiCallStats: any[];
         cookies: any[];
         targets: any[];
@@ -19,6 +19,7 @@ declare class ClickhouseReporter extends BaseReporter {
      * @param {string} region
      */
     createCrawl(name?: string, region?: string): any;
+    deleteCrawlData(): Promise<void>;
     /**
      * @param {import('../crawler').CollectResult} data
      */

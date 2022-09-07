@@ -37,6 +37,6 @@ type CollectorInitOptions = {
     url: URL;
     log: (...args: any[]) => void;
     collectorFlags: {
-        [x: string]: boolean;
+        [x: string]: string;
     };
 };

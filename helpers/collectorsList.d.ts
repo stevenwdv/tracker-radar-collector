@@ -1,12 +1,6 @@
 export type CollectorData = {
     apis?: import('../collectors/APICallCollector').APICallReport | undefined;
-    cmps?: {
-        name: string;
-        isOpen: boolean;
-        optOutRuns: boolean;
-        optOutSucceeds: boolean;
-        error: string;
-    }[] | undefined;
+    cmps?: import('../collectors/CMPCollector').CMPResult[] | undefined;
     cookies?: import('../collectors/CookieCollector').CookieData[] | undefined;
     elements?: {
         present: string[];
