@@ -2,28 +2,34 @@ export = CMPCollector;
 declare class CMPCollector extends BaseCollector {
     log: (...arg0: any[]) => void;
     shortTimeouts: string;
-    autoAction: import("@duckduckgo/autoconsent/lib/types").AutoAction;
-    /** @type {import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage[]} */
-    receivedMsgs: import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage[];
+    /** @private */
+    private autoAction;
+    /**
+     * @type {import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage[]}
+     * @private
+     */
+    private receivedMsgs;
     selfTestFrame: any;
     isolated2pageworld: Map<any, any>;
     /**
      * @param {Partial<import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage>} msg
      * @returns {import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage | null}
+     * @private
      */
-    findMessage(msg: Partial<import("@duckduckgo/autoconsent/lib/messages").ContentScriptMessage>, partial?: boolean): import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage | null;
+    private findMessage;
     /**
      * @param {Partial<import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage>} msg
      * @returns {import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage[]}
+     * @private
      */
-    findAllMessages(msg: Partial<import("@duckduckgo/autoconsent/lib/messages").ContentScriptMessage>, partial?: boolean): import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage[];
+    private findAllMessages;
     /**
-     * @param {{cdpClient: import('puppeteer').CDPSession, url: string, type: import('./TargetCollector').TargetType}} targetInfo
+     * @param {{cdpClient: import('puppeteer').CDPSession, url: string, type: import('./TargetCollector.js').TargetType}} targetInfo
      */
     addTarget(targetInfo: {
         cdpClient: import('puppeteer').CDPSession;
         url: string;
-        type: import('./TargetCollector').TargetType;
+        type: import('./TargetCollector.js').TargetType;
     }): Promise<void>;
     _cdpClient: import("puppeteer").CDPSession;
     /**
@@ -32,21 +38,25 @@ declare class CMPCollector extends BaseCollector {
      * @param {import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage} msg
      * @param {any} executionContextId
      * @returns {Promise<void>}
+     * @private
      */
-    handleMessage(msg: import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage, executionContextId: any): Promise<void>;
+    private handleMessage;
     /**
      * @param {Partial<import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage>} msg
      * @returns {Promise<import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage>}
+     * @private
      */
-    waitForMessage(msg: Partial<import("@duckduckgo/autoconsent/lib/messages").ContentScriptMessage>, maxTimes?: number, interval?: number): Promise<import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage>;
+    private waitForMessage;
     /**
      * @returns {Promise<void>}
+     * @private
      */
-    waitForFinish(): Promise<void>;
+    private waitForFinish;
     /**
      * @returns {CMPResult[]}
+     * @private
      */
-    collectResults(): CMPResult[];
+    private collectResults;
     /**
      * Called after the crawl to retrieve the data. Can be async, can throw errors.
      *

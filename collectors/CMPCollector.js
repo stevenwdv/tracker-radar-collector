@@ -37,13 +37,17 @@ class CMPCollector extends BaseCollector {
     }
 
     /**
-     * @param {import('./BaseCollector').CollectorInitOptions} options
+     * @param {import('./BaseCollector.js').CollectorInitOptions} options
      */
     init(options) {
         this.log = options.log;
         this.shortTimeouts = options.collectorFlags.shortTimeouts; // used to speed up unit tests
+        /** @private */
         this.autoAction = /** @type {import('@duckduckgo/autoconsent/lib/types').AutoAction} */ (options.collectorFlags.autoconsentAction);
-        /** @type {import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage[]} */
+        /**
+         * @type {import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage[]}
+         * @private
+         */
         this.receivedMsgs = [];
         this.selfTestFrame = null;
         this.isolated2pageworld = new Map();
@@ -52,6 +56,7 @@ class CMPCollector extends BaseCollector {
     /**
      * @param {Partial<import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage>} msg
      * @returns {import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage | null}
+     * @private
      */
     findMessage(msg, partial = true) {
         for (const m of this.receivedMsgs) {
@@ -67,6 +72,7 @@ class CMPCollector extends BaseCollector {
     /**
      * @param {Partial<import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage>} msg
      * @returns {import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage[]}
+     * @private
      */
     findAllMessages(msg, partial = true) {
         return this.receivedMsgs.filter(m => {
@@ -77,7 +83,7 @@ class CMPCollector extends BaseCollector {
     }
 
     /**
-     * @param {{cdpClient: import('puppeteer').CDPSession, url: string, type: import('./TargetCollector').TargetType}} targetInfo
+     * @param {{cdpClient: import('puppeteer').CDPSession, url: string, type: import('./TargetCollector.js').TargetType}} targetInfo
      */
     // eslint-disable-next-line no-unused-vars
     async addTarget(targetInfo) {
@@ -133,6 +139,7 @@ class CMPCollector extends BaseCollector {
      * @param {import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage} msg
      * @param {any} executionContextId
      * @returns {Promise<void>}
+     * @private
      */
     async handleMessage(msg, executionContextId) {
         this.receivedMsgs.push(msg);
@@ -199,6 +206,7 @@ class CMPCollector extends BaseCollector {
     /**
      * @param {Partial<import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage>} msg
      * @returns {Promise<import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage>}
+     * @private
      */
     async waitForMessage(msg, maxTimes = 20, interval = 100) {
         if (this.shortTimeouts) {
@@ -211,6 +219,7 @@ class CMPCollector extends BaseCollector {
 
     /**
      * @returns {Promise<void>}
+     * @private
      */
     async waitForFinish() {
         // check if anything was detected at all
@@ -258,6 +267,7 @@ class CMPCollector extends BaseCollector {
 
     /**
      * @returns {CMPResult[]}
+     * @private
      */
     collectResults() {
         /**

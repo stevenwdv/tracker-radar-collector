@@ -72,6 +72,7 @@ describe('CMPCollector', () => {
                     url: 'some-url',
                 };
                 commands.splice(0, commands.length);
+                // @ts-expect-error private
                 await collector.handleMessage(msg, 1111);
                 assert.strictEqual(commands.length, 1);
                 assert.deepStrictEqual(commands[0], ['Runtime.evaluate', {
@@ -98,6 +99,7 @@ describe('CMPCollector', () => {
                     scheduleSelfTest: true,
                     url: 'some url',
                 };
+                // @ts-expect-error private
                 await collector.handleMessage(msg, 1337);
                 assert.strictEqual(collector.selfTestFrame, 1337);
             });
@@ -113,6 +115,7 @@ describe('CMPCollector', () => {
                     scheduleSelfTest: false,
                     url: 'some url',
                 };
+                // @ts-expect-error private
                 await collector.handleMessage(msg, 1337);
                 assert.strictEqual(collector.selfTestFrame, null);
             });
@@ -130,6 +133,7 @@ describe('CMPCollector', () => {
                     scheduleSelfTest: true,
                     url: 'some url',
                 };
+                // @ts-expect-error private
                 await collector.handleMessage(msg, 1337);
                 assert.strictEqual(collector.selfTestFrame, 1337);
             });
@@ -145,6 +149,7 @@ describe('CMPCollector', () => {
                     scheduleSelfTest: false,
                     url: 'some url',
                 };
+                // @ts-expect-error private
                 await collector.handleMessage(msg, 1337);
                 assert.strictEqual(collector.selfTestFrame, null);
             });
@@ -162,6 +167,7 @@ describe('CMPCollector', () => {
                 };
                 collector.selfTestFrame = null;
                 commands.splice(0, commands.length);
+                // @ts-expect-error private
                 await collector.handleMessage(msg, 1111);
                 assert.strictEqual(commands.length, 0);
             });
@@ -177,6 +183,7 @@ describe('CMPCollector', () => {
                 };
                 collector.selfTestFrame = 1337;
                 commands.splice(0, commands.length);
+                // @ts-expect-error private
                 await collector.handleMessage(msg, 1111);
                 assert.strictEqual(commands.length, 1);
                 assert.deepStrictEqual(commands.pop(), ['Runtime.evaluate', {
@@ -199,6 +206,7 @@ describe('CMPCollector', () => {
                 };
                 commands.splice(0, commands.length);
                 collector.isolated2pageworld = new Map([[1111, 2222]]);
+                // @ts-expect-error private
                 await collector.handleMessage(msg, 1111);
                 assert.strictEqual(commands.length, 2);
                 assert.deepStrictEqual(commands[0], ['Runtime.evaluate', {
@@ -273,6 +281,7 @@ describe('CMPCollector', () => {
         });
 
         it('CMP with a visible popup - opt-out OFF', async function() {
+            // @ts-expect-error private
             collector.autoAction = null;
             const contentScriptEval = commands.find(cmd => cmd[0] === 'Runtime.evaluate')[1];
             assert.strictEqual(contentScriptEval.contextId, 31337);
