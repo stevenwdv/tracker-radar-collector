@@ -295,7 +295,6 @@ module.exports = TrackerTracker;
 /**
  * @typedef {string} CDPContextId
  */
-
 /**
  * @typedef {string} CDPBreakpointId
  */
