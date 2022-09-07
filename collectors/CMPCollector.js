@@ -1,12 +1,10 @@
 /* eslint-disable max-lines */
 const fs = require('fs');
-const path = require('path');
 const waitFor = require('../helpers/waitFor');
 const BaseCollector = require('./BaseCollector');
 
-// @ts-ignore
 const baseContentScript = fs.readFileSync(
-    path.join(__dirname, "../node_modules/@duckduckgo/autoconsent/dist/autoconsent.playwright.js"),
+    require.resolve('@duckduckgo/autoconsent/dist/autoconsent.playwright.js'),
     "utf8"
 );
 
