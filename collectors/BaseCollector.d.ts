@@ -21,13 +21,13 @@ declare class BaseCollector {
      * Called after the crawl to retrieve the data. Can be async, can throw errors.
      *
      * @param {{finalUrl: string, urlFilter?: function(string):boolean, pageLoadDurationMs: number}} options
-     * @returns {Promise<Object>|Object}
+     * @returns {Promise<unknown>|unknown}
      */
     getData(options: {
         finalUrl: string;
         urlFilter?: (arg0: string) => boolean;
         pageLoadDurationMs: number;
-    }): Promise<Object> | Object;
+    }): Promise<unknown> | unknown;
 }
 declare namespace BaseCollector {
     export { CollectorInitOptions };

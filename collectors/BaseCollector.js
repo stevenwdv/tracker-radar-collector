@@ -26,7 +26,7 @@ class BaseCollector {
      * Called after the crawl to retrieve the data. Can be async, can throw errors.
      *
      * @param {{finalUrl: string, urlFilter?: function(string):boolean, pageLoadDurationMs: number}} options
-     * @returns {Promise<Object>|Object}
+     * @returns {Promise<unknown>|unknown}
      */
     // eslint-disable-next-line no-unused-vars
     getData(options) {
