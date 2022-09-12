@@ -623,7 +623,7 @@ module.exports = breakpoints;
  * @property {boolean=} saveArguments - save arguments of each call (defaults to false)
  * @property {boolean=} fullStack save full call stack
  * @property {boolean=} pauseDebugger pause debugger on hit
- * @property {(string | function(any): any)=} customCapture custom capturing function
+ * @property {(string | function(any): unknown)=} customCapture custom capturing function
  */
 
 /**
@@ -636,5 +636,5 @@ module.exports = breakpoints;
  * @property {boolean=} setter - hook up to a property setter instead of getter (which is a default)
  * @property {boolean=} fullStack save full call stack
  * @property {boolean=} pauseDebugger pause debugger on hit
- * @property {(string | function(any): any)=} customCapture custom capturing function
+ * @property {(string | function(any): unknown)=} customCapture custom capturing function
  */

@@ -45,9 +45,9 @@ declare class TrackerTracker {
      * @param {CDPContextId} contextId
      * @param {boolean} fullStack
      * @param {boolean} pauseDebugger
-     * @param {(string | function(any): any)} customCapture
+     * @param {(string | function(any): unknown)} customCapture
      */
-    _addBreakpoint(expression: string, condition: (string | ((arg0: any) => boolean)), description: string, contextId: CDPContextId, saveArguments: boolean, fullStack: boolean, pauseDebugger: boolean, customCapture: (string | ((arg0: any) => any))): Promise<void>;
+    _addBreakpoint(expression: string, condition: (string | ((arg0: any) => boolean)), description: string, contextId: CDPContextId, saveArguments: boolean, fullStack: boolean, pauseDebugger: boolean, customCapture: (string | ((arg0: any) => unknown))): Promise<void>;
     /**
      * @param {CDPContextId} contextId
      */
@@ -71,7 +71,7 @@ declare class TrackerTracker {
     _getBreakpointByName(breakpointName: string): import('./breakpoints').MethodBreakpoint | import('./breakpoints').PropertyBreakpoint;
     /**
      * @param {{payload: string, description: string, executionContextId: number}} params
-     * @returns {{description: string, source: string, saveArguments: boolean, arguments: string[], stack?: string[], custom?: any}}
+     * @returns {{description: string, source: string, saveArguments: boolean, arguments: string[], stack?: string[], custom?: unknown}}
      */
     processDebuggerPause(params: {
         payload: string;
@@ -83,7 +83,7 @@ declare class TrackerTracker {
         saveArguments: boolean;
         arguments: string[];
         stack?: string[];
-        custom?: any;
+        custom?: unknown;
     };
 }
 declare namespace TrackerTracker {

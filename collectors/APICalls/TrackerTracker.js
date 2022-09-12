@@ -63,7 +63,7 @@ class TrackerTracker {
      * @param {CDPContextId} contextId
      * @param {boolean} fullStack
      * @param {boolean} pauseDebugger
-     * @param {(string | function(any): any)} customCapture
+     * @param {(string | function(any): unknown)} customCapture
      */
     async _addBreakpoint(
         expression, condition, description, contextId, saveArguments,
@@ -235,7 +235,7 @@ class TrackerTracker {
 
     /**
      * @param {{payload: string, description: string, executionContextId: number}} params
-     * @returns {{description: string, source: string, saveArguments: boolean, arguments: string[], stack?: string[], custom?: any}}
+     * @returns {{description: string, source: string, saveArguments: boolean, arguments: string[], stack?: string[], custom?: unknown}}
      */
     processDebuggerPause(params) {
         let payload = null;
@@ -272,7 +272,7 @@ class TrackerTracker {
         // this._log('breakpoint', params, script);
 
         /**
-         * @type {{description: string, source: string, saveArguments: boolean, arguments: string[], stack?: string[], custom?: any}}
+         * @type {{description: string, source: string, saveArguments: boolean, arguments: string[], stack?: string[], custom?: unknown}}
          */
         const result = {
             description: payload.description,

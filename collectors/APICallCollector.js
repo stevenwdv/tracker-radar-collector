@@ -181,7 +181,7 @@ module.exports = APICallCollector;
  * @property {string} description - breakpoint description
  * @property {string[]} arguments - preview or the passed arguments
  * @property {string[]} [stack] - full stack
- * @property {any=} custom - custom captured data
+ * @property {unknown=} custom - custom captured data
  */
 
 /**

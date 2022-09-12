@@ -44,7 +44,7 @@ type MethodBreakpoint = {
     /**
      * custom capturing function
      */
-    customCapture?: (string | ((arg0: any) => any)) | undefined;
+    customCapture?: (string | ((arg0: any) => unknown)) | undefined;
 };
 type PropertyBreakpoint = {
     /**
@@ -82,5 +82,5 @@ type PropertyBreakpoint = {
     /**
      * custom capturing function
      */
-    customCapture?: (string | ((arg0: any) => any)) | undefined;
+    customCapture?: (string | ((arg0: any) => unknown)) | undefined;
 };
