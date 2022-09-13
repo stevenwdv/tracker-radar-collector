@@ -380,7 +380,7 @@ class RequestCollector extends BaseCollector {
                 redirectedTo: request.redirectedTo,
                 redirectedFrom: request.redirectedFrom,
                 initiators: Array.from(getAllInitiators(request.initiator)),
-                stack: getStack(request.initiator),
+                stack: request.initiator && getStack(request.initiator),
                 time: (request.startTime && request.endTime) ? (request.endTime - request.startTime) : undefined,
                 wallTime: request.wallTime,
                 postData: request.postData

@@ -26,7 +26,7 @@ function getInitiatorsFromStack(stack) {
 }
 
 /**
- * @param {RequestInitiator} initiator
+ * @param {RequestInitiator=} initiator
  * @returns {Set<string>}
  */
 function getAllInitiators(initiator) {
