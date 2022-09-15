@@ -442,7 +442,7 @@ module.exports = RequestCollector;
  */
 
 /**
- * @typedef {'Document'|'Stylesheet'|'Image'|'Media'|'Font'|'Script'|'TextTrack'|'XHR'|'Fetch'|'EventSource'|'WebSocket'|'Manifest'|'SignedExchange'|'Ping'|'CSPViolationReport'|'Other'} ResourceType
+ * @typedef {import('puppeteer').Protocol.Network.ResourceType} ResourceType
  */
 
 /**
@@ -468,5 +468,5 @@ module.exports = RequestCollector;
  */
 
 /**
- * @typedef {'GET'|'PUT'|'POST'|'DELETE'|'HEAD'|'OPTIONS'|'CONNNECT'|'TRACE'|'PATCH'} HttpMethod
+ * @typedef {'GET'|'PUT'|'POST'|'DELETE'|'HEAD'|'OPTIONS'|'CONNECT'|'TRACE'|'PATCH'} HttpMethod
  */

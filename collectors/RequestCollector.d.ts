@@ -166,7 +166,7 @@ type CDPRequest = {
 };
 type Timestamp = number;
 type FrameId = string;
-type ResourceType = 'Document' | 'Stylesheet' | 'Image' | 'Media' | 'Font' | 'Script' | 'TextTrack' | 'XHR' | 'Fetch' | 'EventSource' | 'WebSocket' | 'Manifest' | 'SignedExchange' | 'Ping' | 'CSPViolationReport' | 'Other';
+type ResourceType = import('puppeteer').Protocol.Network.ResourceType;
 type CDPResponse = {
     url: string;
     status: number;
@@ -208,4 +208,4 @@ type RequestData = {
      */
     wallTime?: number | undefined;
 };
-type HttpMethod = 'GET' | 'PUT' | 'POST' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'CONNNECT' | 'TRACE' | 'PATCH';
+type HttpMethod = 'GET' | 'PUT' | 'POST' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'CONNECT' | 'TRACE' | 'PATCH';
