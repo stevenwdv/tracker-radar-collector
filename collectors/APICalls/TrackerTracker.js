@@ -1,6 +1,7 @@
+/* eslint-disable max-lines */
 const MAX_ASYNC_CALL_STACK_DEPTH = 32;// max depth of async calls tracked
-const URL = require('url').URL;
-const STACK_SOURCE_REGEX = /\((https?:\/\/.*?):[0-9]+:[0-9]+\)/i;
+const URL                        = require('url').URL;
+const STACK_SOURCE_REGEX         = /\((https?:\/\/.*?):[0-9]+:[0-9]+\)/i;
 
 class TrackerTracker {
     /**
@@ -93,7 +94,7 @@ class TrackerTracker {
                 const data = {
                     description: ${JSON.stringify(description)},
                     stack: Error().stack,
-                    fullStack: ${fullStack},
+                    fullStack: ${JSON.stringify(fullStack)},
                     custom: (${String(customCaptureFun)}).call(this, this),
                 };
             `;
@@ -206,7 +207,9 @@ class TrackerTracker {
      * @returns {string[]}
      */
     _getStackFrames(stack) {
-        return [...stack.matchAll(/^\s*at\s+(.+)$/mg)].map(m => m[1]);
+        return [...stack.matchAll(/^\s*at\s+(.+)$/mg)]
+            .filter(([, m], i) => !(i === 0 && m.startsWith('eval ')))
+            .map(([, m]) => m);
     }
 
     /**
@@ -295,6 +298,7 @@ module.exports = TrackerTracker;
 /**
  * @typedef {string} CDPContextId
  */
+
 /**
  * @typedef {string} CDPBreakpointId
  */
