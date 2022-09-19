@@ -194,7 +194,7 @@ type RequestData = {
     } | undefined;
     responseBodyHash?: string | undefined;
     postData?: string | undefined;
-    failureReason: string;
+    failureReason?: string | undefined;
     /**
      * in bytes
      */

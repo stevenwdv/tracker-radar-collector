@@ -410,7 +410,7 @@ module.exports = RequestCollector;
  * @property {Object<string,string>=} responseHeaders
  * @property {string=} responseBodyHash
  * @property {string=} postData
- * @property {string} failureReason
+ * @property {string=} failureReason
  * @property {number=} size in bytes
  * @property {number=} time duration in seconds
  * @property {number} wallTime of the request in milliseconds since the unix epoch
