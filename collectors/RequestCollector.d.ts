@@ -14,9 +14,9 @@ declare class RequestCollector extends BaseCollector {
      */
     _requests: InternalRequestData[];
     /**
-     * @type {Map<string, InternalRequestData>}
+     * @type {Map<string, Partial<InternalRequestData>>}
      */
-    _unmatched: Map<string, InternalRequestData>;
+    _unmatched: Map<string, Partial<InternalRequestData>>;
     _headersFromRequestWillBeSentExtraInfo: Map<any, any>;
     _log: (...arg0: any[]) => void;
     /**
@@ -152,7 +152,7 @@ type InternalRequestData = {
     size?: number | undefined;
     startTime?: Timestamp | undefined;
     endTime?: Timestamp | undefined;
-    wallTime?: number | undefined;
+    wallTime: number;
     responseBodyHash?: string | undefined;
     postData?: string | undefined;
 };
@@ -206,6 +206,6 @@ type RequestData = {
     /**
      * of the request in milliseconds since the unix epoch
      */
-    wallTime?: number | undefined;
+    wallTime: number;
 };
 type HttpMethod = 'GET' | 'PUT' | 'POST' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'CONNECT' | 'TRACE' | 'PATCH';

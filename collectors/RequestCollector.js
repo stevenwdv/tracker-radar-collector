@@ -39,7 +39,7 @@ class RequestCollector extends BaseCollector {
          */
         this._requests = [];
         /**
-         * @type {Map<string, InternalRequestData>}
+         * @type {Map<string, Partial<InternalRequestData>>}
          */
         this._unmatched = new Map();
         this._headersFromRequestWillBeSentExtraInfo = new Map();
@@ -191,7 +191,8 @@ class RequestCollector extends BaseCollector {
             id: request.requestId,
             url: request.url,
             type: 'WebSocket',
-            initiator: request.initiator
+            initiator: request.initiator,
+            wallTime: Date.now(),
         });
     }
 
@@ -220,6 +221,7 @@ class RequestCollector extends BaseCollector {
             type,
             response
         } = data;
+        /** @type Partial<InternalRequestData> */
         let request = this.findLastRequestWithId(id);
 
         if (!request) {
@@ -273,6 +275,7 @@ class RequestCollector extends BaseCollector {
             requestId: id,
             headers
         } = data;
+        /** @type Partial<InternalRequestData> */
         let request = this.findLastRequestWithId(id);
 
         if (!request) {
@@ -295,6 +298,7 @@ class RequestCollector extends BaseCollector {
      * @param {import('puppeteer').CDPSession} cdp
      */
     async handleFailedRequest(data, cdp) {
+        /** @type Partial<InternalRequestData> */
         let request = this.findLastRequestWithId(data.requestId);
 
         if (!request) {
@@ -320,6 +324,7 @@ class RequestCollector extends BaseCollector {
      * @param {import('puppeteer').CDPSession} cdp
      */
     async handleFinishedRequest(data, cdp) {
+        /** @type Partial<InternalRequestData> */
         let request = this.findLastRequestWithId(data.requestId);
 
         if (!request) {
@@ -408,7 +413,7 @@ module.exports = RequestCollector;
  * @property {string} failureReason
  * @property {number=} size in bytes
  * @property {number=} time duration in seconds
- * @property {number=} wallTime of the request in milliseconds since the unix epoch
+ * @property {number} wallTime of the request in milliseconds since the unix epoch
  */
 
 /**
@@ -428,7 +433,7 @@ module.exports = RequestCollector;
  * @property {number=} size
  * @property {Timestamp=} startTime
  * @property {Timestamp=} endTime
- * @property {number=} wallTime
+ * @property {number} wallTime
  * @property {string=} responseBodyHash
  * @property {string=} postData
  */
