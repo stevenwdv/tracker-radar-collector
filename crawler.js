@@ -84,8 +84,12 @@ async function getSiteData(context, url, {
     collectorFlags,
     keepOpen,
     throwCollectorErrors,
+    onStart,
 }) {
     const testStarted = Date.now();
+    if (onStart) {
+        onStart(testStarted);
+    }
 
     /**
      * @type {{cdpClient: import('puppeteer').CDPSession, type: string, url: string}[]}
@@ -289,7 +293,6 @@ function isThirdPartyRequest(documentUrl, requestUrl) {
  * @param {CrawlOptions} options
  * @returns {Promise<CollectResult>}
  */
-
 async function crawl(url, options) {
     const log = options.log || (() => {});
     const browser = options.browserContext ? null : await openBrowser(
@@ -328,6 +331,7 @@ async function crawl(url, options) {
             collectorFlags: options.collectorFlags,
             keepOpen,
             throwCollectorErrors: options.throwCollectorErrors,
+            onStart: options.onStart,
         }), maxTotalTimeMs);
     } catch(e) {
         log(chalk.red('Crawl failed'), e);
@@ -364,6 +368,7 @@ module.exports = crawl;
  * @property {boolean=} devtools
  * @property {boolean=} keepOpen
  * @property {boolean=} throwCollectorErrors
+ * @property {OnStart=} onStart Called with crawl start time
  */
 
 /**
@@ -379,6 +384,12 @@ module.exports = crawl;
  * @property {Object.<string, string>} collectorFlags
  * @property {boolean} keepOpen
  * @property {boolean} throwCollectorErrors
+ * @property {OnStart=} onStart
+ */
+
+/**
+ * @callback OnStart
+ * @param {number} testStarted Time when the crawl started
  */
 
 /**
