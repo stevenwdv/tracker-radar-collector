@@ -199,7 +199,13 @@ async function getSiteData(context, url, {
     page.on('dialog', dialog => dialog.dismiss());
 
     // catch and report crash errors
-    page.on('error', e => log(chalk.red('error in page'), String(e)));
+    page.on('error', e => {
+        if (onError) {
+            onError(e, `error in page ${page.url()}`);
+        } else {
+            log(chalk.red(`error in page ${page.url()}`, String(e)));
+        }
+    });
 
     let timeout = false;
 
@@ -333,7 +339,7 @@ async function crawl(url, options) {
             onError: options.onError,
         }), maxTotalTimeMs);
     } catch(e) {
-        log(chalk.red('Crawl failed'), e);
+        log(chalk.red('Crawl failed'), String(e));
         throw e;
     } finally {
         // only close the browser if it was created here and keepOpen is false
