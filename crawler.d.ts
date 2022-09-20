@@ -81,6 +81,6 @@ type GetSiteDataOptions = {
     onStart?: OnStart | undefined;
     onError?: OnError | undefined;
 };
-type OnStart = (testStarted: number) => any;
-type OnError = (error: unknown, context: string, collector?: import('./collectors/BaseCollector') | undefined) => any;
+type OnStart = (testStarted: number) => void;
+type OnError = (error: unknown, context: string, collector?: import('./collectors/BaseCollector') | undefined) => void;
 import puppeteer = require("puppeteer");

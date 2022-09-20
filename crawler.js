@@ -389,6 +389,7 @@ module.exports = crawl;
 /**
  * @callback OnStart
  * @param {number} testStarted Time when the crawl started
+ * @returns {void}
  */
 
 /**
@@ -396,6 +397,7 @@ module.exports = crawl;
  * @param {unknown} error Error that was thrown
  * @param {string} context Additional info
  * @param {import('./collectors/BaseCollector')=} collector Collector that threw the error
+ * @returns {void}
  */
 
 /**
