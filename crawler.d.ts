@@ -6,7 +6,7 @@ export = crawl;
  */
 declare function crawl(url: URL, options: CrawlOptions): Promise<CollectResult>;
 declare namespace crawl {
-    export { CrawlOptions, GetSiteDataOptions, OnStart, CollectResult };
+    export { CrawlOptions, GetSiteDataOptions, OnStart, OnError, CollectResult };
 }
 type CrawlOptions = {
     collectors?: import('./collectors/BaseCollector')[];
@@ -30,11 +30,14 @@ type CrawlOptions = {
     headed?: boolean | undefined;
     devtools?: boolean | undefined;
     keepOpen?: boolean | undefined;
-    throwCollectorErrors?: boolean | undefined;
     /**
      * Called with crawl start time
      */
     onStart?: OnStart | undefined;
+    /**
+     * Called on non-fatal errors, disables logging of errors
+     */
+    onError?: OnError | undefined;
 };
 type CollectResult = {
     /**
@@ -75,8 +78,9 @@ type GetSiteDataOptions = {
         [x: string]: string;
     };
     keepOpen: boolean;
-    throwCollectorErrors: boolean;
     onStart?: OnStart | undefined;
+    onError?: OnError | undefined;
 };
 type OnStart = (testStarted: number) => any;
+type OnError = (error: unknown, context: string, collector?: import('./collectors/BaseCollector') | undefined) => any;
 import puppeteer = require("puppeteer");

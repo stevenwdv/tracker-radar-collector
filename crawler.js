@@ -83,8 +83,8 @@ async function getSiteData(context, url, {
     extraExecutionTimeMs,
     collectorFlags,
     keepOpen,
-    throwCollectorErrors,
     onStart,
+    onError,
 }) {
     const testStarted = Date.now();
     if (onStart) {
@@ -111,17 +111,15 @@ async function getSiteData(context, url, {
             await collector.init(collectorOptions);
             log(`${collector.id()} init took ${timer.getElapsedTime()}s`);
         } catch (e) {
-            log(chalk.yellow(`${collector.id()} init failed`), e);
-            if (throwCollectorErrors) {throw e;}
+            if (onError) {
+                onError(e, 'init failed', collector);
+            } else {
+                log(chalk.yellow(`${collector.id()} init failed`), e);
+            }
         }
     }
 
     let pageTargetCreated = false;
-
-    /**
-     * @type {any[]}
-     */
-    const listenerErrors = [];
 
     // initiate collectors for all contexts (main page, web worker, service worker etc.)
     context.on('targetcreated', async target => {
@@ -137,7 +135,11 @@ async function getSiteData(context, url, {
         try {
             cdpClient = await target.createCDPSession();
         } catch (e) {
-            log(chalk.yellow(`Failed to connect to ${target.type()} "${target.url()}"`), e);
+            if (onError) {
+                onError(e, `failed to connect to ${target.type()} "${target.url()}"`);
+            } else {
+                log(chalk.yellow(`Failed to connect to ${target.type()} "${target.url()}"`), e);
+            }
             return;
         }
 
@@ -149,9 +151,10 @@ async function getSiteData(context, url, {
                 // eslint-disable-next-line no-await-in-loop
                 await collector.addTarget(simpleTarget);
             } catch (e) {
-                log(chalk.yellow(`${collector.id()} failed to attach to ${target.type()} "${target.url()}"`), e);
-                if (throwCollectorErrors) {
-                    listenerErrors.push(e);
+                if (onError) {
+                    onError(e, `${collector.id()} failed to attach to ${target.type()} "${target.url()}"`);
+                } else {
+                    log(chalk.yellow(`${collector.id()} failed to attach to ${target.type()} "${target.url()}"`), e);
                 }
             }
         }
@@ -177,8 +180,11 @@ async function getSiteData(context, url, {
             // eslint-disable-next-line no-await-in-loop
             await collector.addTarget({url: url.toString(), type: 'page', cdpClient});
         } catch (e) {
-            log(chalk.yellow(`${collector.id()} failed to attach to page`), e);
-            if (throwCollectorErrors) {throw e;}
+            if (onError) {
+                onError(e, `failed to attach to page "${url}"`, collector);
+            } else {
+                log(chalk.yellow(`${collector.id()} failed to attach to page "${url}"`), e);
+            }
         }
     }
     log(`page context initiated in ${initPageTimer.getElapsedTime()}s`);
@@ -238,19 +244,12 @@ async function getSiteData(context, url, {
             data[collector.id()] = collectorData;
             log(`getting ${collector.id()} data took ${getDataTimer.getElapsedTime()}s`);
         } catch (e) {
-            log(chalk.yellow(`getting ${collector.id()} data failed`), e);
+            if (onError) {
+                onError(e, 'getting data failed', collector);
+            } else {
+                log(chalk.yellow(`getting ${collector.id()} data failed`), e);
+            }
             data[collector.id()] = null;
-            if (throwCollectorErrors) {throw e;}
-        }
-    }
-
-    if (listenerErrors.length) {
-        if ('AggregateError' in global) {
-            // @ts-ignore AggregateError not defined
-            // eslint-disable-next-line no-undef
-            throw new AggregateError(listenerErrors, 'Errors in collectors during crawl');
-        } else {
-            throw listenerErrors[0];
         }
     }
 
@@ -330,8 +329,8 @@ async function crawl(url, options) {
             extraExecutionTimeMs,
             collectorFlags: options.collectorFlags,
             keepOpen,
-            throwCollectorErrors: options.throwCollectorErrors,
             onStart: options.onStart,
+            onError: options.onError,
         }), maxTotalTimeMs);
     } catch(e) {
         log(chalk.red('Crawl failed'), e);
@@ -367,8 +366,8 @@ module.exports = crawl;
  * @property {boolean=} headed
  * @property {boolean=} devtools
  * @property {boolean=} keepOpen
- * @property {boolean=} throwCollectorErrors
  * @property {OnStart=} onStart Called with crawl start time
+ * @property {OnError=} onError Called on non-fatal errors, disables logging of errors
  */
 
 /**
@@ -383,13 +382,20 @@ module.exports = crawl;
  * @property {number} extraExecutionTimeMs
  * @property {Object.<string, string>} collectorFlags
  * @property {boolean} keepOpen
- * @property {boolean} throwCollectorErrors
  * @property {OnStart=} onStart
+ * @property {OnError=} onError
  */
 
 /**
  * @callback OnStart
  * @param {number} testStarted Time when the crawl started
+ */
+
+/**
+ * @callback OnError
+ * @param {unknown} error Error that was thrown
+ * @param {string} context Additional info
+ * @param {import('./collectors/BaseCollector')=} collector Collector that threw the error
  */
 
 /**
