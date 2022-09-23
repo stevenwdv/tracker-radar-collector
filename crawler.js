@@ -152,7 +152,7 @@ async function getSiteData(context, url, {
                 await collector.addTarget(simpleTarget);
             } catch (e) {
                 if (onError) {
-                    onError(e, `${collector.id()} failed to attach to ${target.type()} "${target.url()}"`);
+                    onError(e, `failed to attach to ${target.type()} "${target.url()}"`, collector);
                 } else {
                     log(chalk.yellow(`${collector.id()} failed to attach to ${target.type()} "${target.url()}"`), e);
                 }
@@ -181,7 +181,7 @@ async function getSiteData(context, url, {
             await collector.addTarget({url: url.toString(), type: 'page', cdpClient});
         } catch (e) {
             if (onError) {
-                onError(e, `failed to attach to page "${url}"`, collector);
+                onError(e, `failed to attach to landing page "${url}"`, collector);
             } else {
                 log(chalk.yellow(`${collector.id()} failed to attach to page "${url}"`), e);
             }
