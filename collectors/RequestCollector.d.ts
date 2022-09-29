@@ -129,7 +129,7 @@ declare class RequestCollector extends BaseCollector {
     }): RequestData[];
 }
 declare namespace RequestCollector {
-    export { RequestData, InternalRequestData, RequestId, Timestamp, ResourceType, FrameId, CDPRequest, CDPResponse, HttpMethod };
+    export { RequestData, InternalRequestData, RequestId, Timestamp, ResourceType, FrameId, CDPRequest, CDPResponse, HttpMethod, StackFrame };
 }
 import BaseCollector = require("./BaseCollector");
 type InternalRequestData = {
@@ -181,7 +181,7 @@ type RequestData = {
     method?: HttpMethod | undefined;
     type: ResourceType;
     initiators?: string[] | undefined;
-    stack?: string[] | undefined;
+    stack?: (StackFrame[] | null) | undefined;
     redirectedFrom?: string | undefined;
     redirectedTo?: string | undefined;
     status?: number | undefined;
@@ -209,3 +209,4 @@ type RequestData = {
     wallTime: number;
 };
 type HttpMethod = 'GET' | 'PUT' | 'POST' | 'DELETE' | 'HEAD' | 'OPTIONS' | 'CONNECT' | 'TRACE' | 'PATCH';
+type StackFrame = import('../helpers/initiators').StackFrame;

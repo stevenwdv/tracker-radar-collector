@@ -50,11 +50,16 @@ function getAllInitiators(initiator) {
 
 /**
  * @param {import('puppeteer').Protocol.Runtime.StackTrace} trace
- * @return {Generator<string, void, undefined>}
+ * @return {Generator<StackFrame, void, undefined>}
  */
 function *getStackFromTrace(trace) {
     for (const frame of trace.callFrames) {
-        yield `${frame.functionName} @${frame.url}:${frame.lineNumber}:${frame.columnNumber}`;
+        yield {
+            url: frame.url,
+            function: frame.functionName,
+            line: frame.lineNumber,
+            column: frame.columnNumber,
+        };
     }
     if (trace.parent) {
         yield* getStackFromTrace(trace.parent);
@@ -63,7 +68,7 @@ function *getStackFromTrace(trace) {
 
 /**
  * @param {RequestInitiator} initiator
- * @return {?string[]}
+ * @return {?StackFrame[]}
  */
 function getStack(initiator) {
     if (!initiator.stack) {return null;}
@@ -77,4 +82,12 @@ module.exports = {
 
 /**
  * @typedef {import('puppeteer').Protocol.Network.Initiator} RequestInitiator
+ */
+
+/**
+ * @typedef StackFrame
+ * @property {string} url
+ * @property {string} function
+ * @property {number} line
+ * @property {number} column
  */

@@ -401,7 +401,7 @@ module.exports = RequestCollector;
  * @property {HttpMethod=} method
  * @property {ResourceType} type
  * @property {string[]=} initiators
- * @property {string[]=} stack
+ * @property {?StackFrame[]=} stack
  * @property {string=} redirectedFrom
  * @property {string=} redirectedTo
  * @property {number=} status
@@ -475,3 +475,5 @@ module.exports = RequestCollector;
 /**
  * @typedef {'GET'|'PUT'|'POST'|'DELETE'|'HEAD'|'OPTIONS'|'CONNECT'|'TRACE'|'PATCH'} HttpMethod
  */
+
+/** @typedef {import('../helpers/initiators').StackFrame} StackFrame */
