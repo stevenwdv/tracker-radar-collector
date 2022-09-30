@@ -1,5 +1,9 @@
 export = CMPCollector;
 declare class CMPCollector extends BaseCollector {
+    /**
+     * @param {CollectorInitOptions} options
+     */
+    init(options: CollectorInitOptions): void;
     log: (...arg0: any[]) => void;
     shortTimeouts: string;
     /** @private */
@@ -77,6 +81,7 @@ declare namespace CMPCollector {
     export { CollectorInitOptions, AutoAction, ContentScriptMessage, AutoconsentConfig, DetectedMessage, SelfTestResultMessage, ErrorMessage, OptOutResultMessage, OptInResultMessage, DoneMessage, ScanResult, CMPResult };
 }
 import BaseCollector = require("./BaseCollector");
+type CollectorInitOptions = import('./BaseCollector').CollectorInitOptions;
 type ScanResult = {
     snippets: string[];
     patterns: string[];
@@ -92,7 +97,6 @@ type CMPResult = {
     patterns: string[];
     snippets: string[];
 };
-type CollectorInitOptions = import('./BaseCollector').CollectorInitOptions;
 type AutoAction = import('@duckduckgo/autoconsent/lib/types').AutoAction;
 type ContentScriptMessage = import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage;
 type AutoconsentConfig = import('@duckduckgo/autoconsent/lib/types').Config;

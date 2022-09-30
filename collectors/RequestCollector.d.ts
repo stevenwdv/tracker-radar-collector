@@ -10,6 +10,10 @@ declare class RequestCollector extends BaseCollector {
     _saveResponseHash: boolean;
     _saveHeaders: string[];
     /**
+     * @param {import('./BaseCollector').CollectorInitOptions} options
+     */
+    init({ log, }: import('./BaseCollector').CollectorInitOptions): void;
+    /**
      * @type {InternalRequestData[]}
      */
     _requests: InternalRequestData[];

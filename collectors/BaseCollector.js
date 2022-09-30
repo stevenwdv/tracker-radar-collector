@@ -8,6 +8,7 @@ class BaseCollector {
      * Called before the crawl begins. Can be async, can throw errors.
      *
      * @param {CollectorInitOptions} options
+     * @returns {Promise<void>|void}
      */
     // eslint-disable-next-line no-unused-vars
     init(options) {
@@ -17,6 +18,7 @@ class BaseCollector {
      * Called whenever new target becomes available (e.g. main page, iframe, web worker). Can be async, can throw errors.
      *
      * @param {{cdpClient: import('puppeteer').CDPSession, url: string, type: import('./TargetCollector').TargetType}} targetInfo
+     * @returns {Promise<void>|void}
      */
     // eslint-disable-next-line no-unused-vars
     addTarget(targetInfo) {
@@ -25,7 +27,7 @@ class BaseCollector {
     /**
      * Called after the page has loaded. Can be async, can throw errors.
      *
-     * @returns {Promise<void>|Object}
+     * @returns {Promise<void>|void}
      */
     postLoad() {
         return Promise.resolve();

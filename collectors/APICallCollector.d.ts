@@ -9,6 +9,10 @@ declare class APICallCollector extends BaseCollector {
      */
     _breakpoints: import('./APICalls/breakpoints').BreakpointObject[];
     /**
+     * @param {import('./BaseCollector').CollectorInitOptions} options
+     */
+    init({ log }: import('./BaseCollector').CollectorInitOptions): void;
+    /**
      * @type {Map<string, Map<string, number>>}
      */
     _stats: Map<string, Map<string, number>>;
