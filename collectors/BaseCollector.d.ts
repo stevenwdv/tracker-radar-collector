@@ -5,18 +5,20 @@ declare class BaseCollector {
      * Called before the crawl begins. Can be async, can throw errors.
      *
      * @param {CollectorInitOptions} options
+     * @returns {Promise<void>|void}
      */
-    init(options: CollectorInitOptions): void;
+    init(options: CollectorInitOptions): Promise<void> | void;
     /**
      * Called whenever new target becomes available (e.g. main page, iframe, web worker). Can be async, can throw errors.
      *
      * @param {{cdpClient: import('puppeteer').CDPSession, url: string, type: import('./TargetCollector').TargetType}} targetInfo
+     * @returns {Promise<void>|void}
      */
     addTarget(targetInfo: {
         cdpClient: import('puppeteer').CDPSession;
         url: string;
         type: import('./TargetCollector').TargetType;
-    }): void;
+    }): Promise<void> | void;
     /**
      * Called after the crawl to retrieve the data. Can be async, can throw errors.
      *

@@ -1,5 +1,9 @@
 export = CMPCollector;
 declare class CMPCollector extends BaseCollector {
+    /**
+     * @param {import('./BaseCollector.js').CollectorInitOptions} options
+     */
+    init(options: import('./BaseCollector.js').CollectorInitOptions): void;
     log: (...arg0: any[]) => void;
     shortTimeouts: string;
     /** @private */

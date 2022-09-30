@@ -7,6 +7,14 @@ declare class CookieCollector extends BaseCollector {
      * @returns {number}
      */
     normalizeDate(cdpDate: number): number;
+    /**
+     * @param {{cdpClient: import('puppeteer').CDPSession, url: string, type: import('./TargetCollector').TargetType}} targetInfo
+     */
+    addTarget({ cdpClient, type }: {
+        cdpClient: import('puppeteer').CDPSession;
+        url: string;
+        type: import('./TargetCollector').TargetType;
+    }): void;
     _cdpClient: import("puppeteer").CDPSession;
     /**
      * @returns {Promise<CookieData[]>}

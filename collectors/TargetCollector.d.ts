@@ -6,6 +6,14 @@ declare class TargetCollector extends BaseCollector {
      */
     _targets: TargetData[];
     /**
+     * @param {{cdpClient: import('puppeteer').CDPSession, url: string, type: TargetType}} targetInfo
+     */
+    addTarget({ type, url }: {
+        cdpClient: import('puppeteer').CDPSession;
+        url: string;
+        type: TargetType;
+    }): void;
+    /**
      * @returns {TargetData[]}
      */
     getData(): TargetData[];
