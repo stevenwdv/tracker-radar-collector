@@ -18,6 +18,12 @@ declare class BaseCollector {
         type: import('./TargetCollector').TargetType;
     }): void;
     /**
+     * Called after the page has loaded. Can be async, can throw errors.
+     *
+     * @returns {Promise<void>|Object}
+     */
+    postLoad(): Promise<void> | Object;
+    /**
      * Called after the crawl to retrieve the data. Can be async, can throw errors.
      *
      * @param {{finalUrl: string, urlFilter?: function(string):boolean, pageLoadDurationMs: number}} options
