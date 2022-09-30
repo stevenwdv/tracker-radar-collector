@@ -9,7 +9,7 @@ declare class CMPCollector extends BaseCollector {
     /** @private */
     private autoAction;
     /**
-     * @type {ContentScriptMessage[]}
+     * @type {import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage[]}
      * @private
      */
     private receivedMsgs;
@@ -24,14 +24,14 @@ declare class CMPCollector extends BaseCollector {
     /** @type {ScanResult} */
     scanResult: ScanResult;
     /**
-     * @param {Partial<ContentScriptMessage>} msg
-     * @returns {ContentScriptMessage | null}
+     * @param {Partial<import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage>} msg
+     * @returns {import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage | null}
      * @private
      */
     private findMessage;
     /**
-     * @param {Partial<ContentScriptMessage>} msg
-     * @returns {ContentScriptMessage[]}
+     * @param {Partial<import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage>} msg
+     * @returns {import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage[]}
      * @private
      */
     private findAllMessages;
@@ -47,15 +47,15 @@ declare class CMPCollector extends BaseCollector {
     /**
      * Implements autoconsent messaging protocol
      *
-     * @param {ContentScriptMessage} msg
+     * @param {import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage} msg
      * @param {any} executionContextId
      * @returns {Promise<void>}
      * @private
      */
     private handleMessage;
     /**
-     * @param {Partial<ContentScriptMessage>} msg
-     * @returns {Promise<ContentScriptMessage>}
+     * @param {Partial<import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage>} msg
+     * @returns {Promise<import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage>}
      * @private
      */
     private waitForMessage;
@@ -78,7 +78,7 @@ declare class CMPCollector extends BaseCollector {
     getData(): Promise<CMPResult[]>;
 }
 declare namespace CMPCollector {
-    export { CollectorInitOptions, AutoAction, ContentScriptMessage, AutoconsentConfig, DetectedMessage, SelfTestResultMessage, ErrorMessage, OptOutResultMessage, OptInResultMessage, DoneMessage, ScanResult, CMPResult };
+    export { CollectorInitOptions, ScanResult, CMPResult };
 }
 import BaseCollector = require("./BaseCollector");
 type CollectorInitOptions = import('./BaseCollector').CollectorInitOptions;
@@ -97,12 +97,3 @@ type CMPResult = {
     patterns: string[];
     snippets: string[];
 };
-type AutoAction = import('@duckduckgo/autoconsent/lib/types').AutoAction;
-type ContentScriptMessage = import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage;
-type AutoconsentConfig = import('@duckduckgo/autoconsent/lib/types').Config;
-type DetectedMessage = import('@duckduckgo/autoconsent/lib/messages').DetectedMessage;
-type SelfTestResultMessage = import('@duckduckgo/autoconsent/lib/messages').SelfTestResultMessage;
-type ErrorMessage = import('@duckduckgo/autoconsent/lib/messages').ErrorMessage;
-type OptOutResultMessage = import('@duckduckgo/autoconsent/lib/messages').OptOutResultMessage;
-type OptInResultMessage = import('@duckduckgo/autoconsent/lib/messages').OptInResultMessage;
-type DoneMessage = import('@duckduckgo/autoconsent/lib/messages').DoneMessage;

@@ -6,15 +6,6 @@ const BaseCollector = require('./BaseCollector');
 
 /**
  * @typedef { import('./BaseCollector').CollectorInitOptions } CollectorInitOptions
- * @typedef { import('@duckduckgo/autoconsent/lib/types').AutoAction } AutoAction
- * @typedef { import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage } ContentScriptMessage
- * @typedef { import('@duckduckgo/autoconsent/lib/types').Config } AutoconsentConfig
- * @typedef { import('@duckduckgo/autoconsent/lib/messages').DetectedMessage } DetectedMessage
- * @typedef { import('@duckduckgo/autoconsent/lib/messages').SelfTestResultMessage } SelfTestResultMessage
- * @typedef { import('@duckduckgo/autoconsent/lib/messages').ErrorMessage } ErrorMessage
- * @typedef { import('@duckduckgo/autoconsent/lib/messages').OptOutResultMessage } OptOutResultMessage
- * @typedef { import('@duckduckgo/autoconsent/lib/messages').OptInResultMessage } OptInResultMessage
- * @typedef { import('@duckduckgo/autoconsent/lib/messages').DoneMessage } DoneMessage
  * @typedef { { snippets: string[], patterns: string[] } } ScanResult
  */
 
@@ -83,9 +74,9 @@ class CMPCollector extends BaseCollector {
         this.log = options.log;
         this.shortTimeouts = options.collectorFlags.shortTimeouts; // used to speed up unit tests
         /** @private */
-        this.autoAction = /** @type {AutoAction} */ (options.collectorFlags.autoconsentAction);
+        this.autoAction = /** @type {import('@duckduckgo/autoconsent/lib/types').AutoAction} */ (options.collectorFlags.autoconsentAction);
         /**
-         * @type {ContentScriptMessage[]}
+         * @type {import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage[]}
          * @private
          */
         this.receivedMsgs = [];
@@ -101,8 +92,8 @@ class CMPCollector extends BaseCollector {
     }
 
     /**
-     * @param {Partial<ContentScriptMessage>} msg
-     * @returns {ContentScriptMessage | null}
+     * @param {Partial<import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage>} msg
+     * @returns {import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage | null}
      * @private
      */
     findMessage(msg, partial = true) {
@@ -117,8 +108,8 @@ class CMPCollector extends BaseCollector {
     }
 
     /**
-     * @param {Partial<ContentScriptMessage>} msg
-     * @returns {ContentScriptMessage[]}
+     * @param {Partial<import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage>} msg
+     * @returns {import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage[]}
      * @private
      */
     findAllMessages(msg, partial = true) {
@@ -183,7 +174,7 @@ class CMPCollector extends BaseCollector {
     /**
      * Implements autoconsent messaging protocol
      *
-     * @param {ContentScriptMessage} msg
+     * @param {import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage} msg
      * @param {any} executionContextId
      * @returns {Promise<void>}
      * @private
@@ -192,7 +183,7 @@ class CMPCollector extends BaseCollector {
         this.receivedMsgs.push(msg);
         switch (msg.type) {
         case 'init': {
-            /** @type {AutoconsentConfig} */
+            /** @type {import('@duckduckgo/autoconsent/lib/types').Config} */
             const autoconsentConfig = {
                 enabled: true,
                 autoAction: null, // we request action explicitly later
@@ -260,8 +251,8 @@ class CMPCollector extends BaseCollector {
     }
 
     /**
-     * @param {Partial<ContentScriptMessage>} msg
-     * @returns {Promise<ContentScriptMessage>}
+     * @param {Partial<import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage>} msg
+     * @returns {Promise<import('@duckduckgo/autoconsent/lib/messages').ContentScriptMessage>}
      * @private
      */
     async waitForMessage(msg, maxTimes = 20, interval = 100) {
@@ -279,7 +270,7 @@ class CMPCollector extends BaseCollector {
      */
     async waitForFinish() {
         // check if anything was detected at all
-        const detectedMsg = /** @type {DetectedMessage} */ (await this.waitForMessage({type: 'cmpDetected'}));
+        const detectedMsg = /** @type {import('@duckduckgo/autoconsent/lib/messages').DetectedMessage} */ (await this.waitForMessage({type: 'cmpDetected'}));
         if (!detectedMsg) {
             return;
         }
@@ -296,7 +287,7 @@ class CMPCollector extends BaseCollector {
 
         // did we opt-out?
         const resultType = this.autoAction === 'optOut' ? 'optOutResult' : 'optInResult';
-        const autoActionDone = /** @type {OptOutResultMessage|OptInResultMessage} */ (await this.waitForMessage({
+        const autoActionDone = /** @type {import('@duckduckgo/autoconsent/lib/messages').OptOutResultMessage|import('@duckduckgo/autoconsent/lib/messages').OptInResultMessage} */ (await this.waitForMessage({
             type: resultType,
             cmp: detectedMsg.cmp
         }));
@@ -305,7 +296,7 @@ class CMPCollector extends BaseCollector {
                 return;
             }
         }
-        const doneMsg = /** @type {DoneMessage} */ (await this.waitForMessage({
+        const doneMsg = /** @type {import('@duckduckgo/autoconsent/lib/messages').DoneMessage} */ (await this.waitForMessage({
             type: 'autoconsentDone'
         }));
         if (!doneMsg) {
@@ -369,20 +360,20 @@ class CMPCollector extends BaseCollector {
          */
         const results = [];
 
-        const doneMsg = /** @type {DoneMessage} */ (this.findMessage({
+        const doneMsg = /** @type {import('@duckduckgo/autoconsent/lib/messages').DoneMessage} */ (this.findMessage({
             type: 'autoconsentDone'
         }));
 
-        const selfTestResult = /** @type {SelfTestResultMessage} */ (this.findMessage({
+        const selfTestResult = /** @type {import('@duckduckgo/autoconsent/lib/messages').SelfTestResultMessage} */ (this.findMessage({
             type: 'selfTestResult'
         }));
 
-        const errorMsgs = /** @type {ErrorMessage[]} */ (this.findAllMessages({
+        const errorMsgs = /** @type {import('@duckduckgo/autoconsent/lib/messages').ErrorMessage[]} */ (this.findAllMessages({
             type: 'autoconsentError',
         }));
         const errors = errorMsgs.map(e => JSON.stringify(e.details));
 
-        const detectedRules = /** @type {DetectedMessage[]} */ (this.findAllMessages({type: 'cmpDetected'}));
+        const detectedRules = /** @type {import('@duckduckgo/autoconsent/lib/messages').DetectedMessage[]} */ (this.findAllMessages({type: 'cmpDetected'}));
         /** @type {string[]} */
         const processedCmps = [];
         for (const msg of detectedRules) {
@@ -411,7 +402,7 @@ class CMPCollector extends BaseCollector {
                 if (this.autoAction) {
                     const resultType = this.autoAction === 'optOut' ? 'optOutResult' : 'optInResult';
                     result.started = true;
-                    const autoActionResult = /** @type {OptOutResultMessage|OptInResultMessage} */ (this.findMessage({
+                    const autoActionResult = /** @type {import('@duckduckgo/autoconsent/lib/messages').OptOutResultMessage|import('@duckduckgo/autoconsent/lib/messages').OptInResultMessage} */ (this.findMessage({
                         type: resultType,
                         cmp: msg.cmp,
                     }));
