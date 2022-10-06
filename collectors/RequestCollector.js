@@ -302,7 +302,7 @@ class RequestCollector extends BaseCollector {
         let request = this.findLastRequestWithId(data.requestId);
 
         if (!request) {
-            this._log('⚠️ unmatched failed response', data);
+            this._log('⚠️ unmatched failed response', JSON.stringify(data));
             request = {
                 id: data.requestId,
                 url: '<unknown>',
@@ -328,7 +328,7 @@ class RequestCollector extends BaseCollector {
         let request = this.findLastRequestWithId(data.requestId);
 
         if (!request) {
-            this._log('⚠️ unmatched finished response', data);
+            this._log('⚠️ unmatched finished response', JSON.stringify(data));
             request = {
                 id: data.requestId,
                 url: '<unknown>',
