@@ -57,8 +57,8 @@ function *getStackFromTrace(trace) {
         yield {
             url: frame.url,
             function: frame.functionName,
-            line: frame.lineNumber,
-            column: frame.columnNumber,
+            line: frame.lineNumber + 1,
+            column: frame.columnNumber + 1,
         };
     }
     if (trace.parent) {
