@@ -6,7 +6,7 @@ export = crawl;
  */
 declare function crawl(url: URL, options: CrawlOptions): Promise<CollectResult>;
 declare namespace crawl {
-    export { CrawlOptions, GetSiteDataOptions, OnStart, OnError, CollectResult };
+    export { CrawlOptions, GetSiteDataOptions, OnStart, OnError, OnHttpError, CollectResult };
 }
 type CrawlOptions = {
     collectors?: import('./collectors/BaseCollector')[];
@@ -38,6 +38,11 @@ type CrawlOptions = {
      * Called on non-fatal errors, disables logging of errors
      */
     onError?: OnError | undefined;
+    /**
+     * Called on page load errors, return `false` to abort crawl,
+     * disables logging of such errors, when unspecified crawl is stopped on only some errors
+     */
+    onHttpError?: OnHttpError | undefined;
 };
 type CollectResult = {
     /**
@@ -52,6 +57,10 @@ type CollectResult = {
      * true if page didn't fully load before the timeout and loading had to be stopped by the crawler
      */
     timeout: boolean;
+    /**
+     * may be unset on timeout
+     */
+    httpStatusCode?: number | undefined;
     /**
      * time when the crawl started (unix timestamp)
      */
@@ -80,7 +89,9 @@ type GetSiteDataOptions = {
     keepOpen: boolean;
     onStart?: OnStart | undefined;
     onError?: OnError | undefined;
+    onHttpError?: OnHttpError | undefined;
 };
 type OnStart = (testStarted: number) => void;
 type OnError = (error: unknown, context: string, collector?: import('./collectors/BaseCollector') | undefined) => void;
+type OnHttpError = (statusCode: number) => boolean;
 import puppeteer = require("puppeteer");

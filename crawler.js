@@ -85,6 +85,7 @@ async function getSiteData(context, url, {
     keepOpen,
     onStart,
     onError,
+    onHttpError,
 }) {
     const testStarted = Date.now();
     if (onStart) {
@@ -209,12 +210,28 @@ async function getSiteData(context, url, {
 
     let timeout = false;
 
+    let httpStatusCode;
     const loadStart = performance.now();
     try {
-        await page.goto(url.toString(), {timeout: maxLoadTimeMs, waitUntil: 'networkidle0'});
+        const response = await page.goto(url.toString(), {timeout: maxLoadTimeMs, waitUntil: 'networkidle0'});
+        httpStatusCode = response.status();
+        if (!response.ok()) {
+            let doContinue;
+            if (onHttpError) {
+                doContinue = onHttpError(httpStatusCode);
+            } else {
+                doContinue = httpStatusCode !== 404 && httpStatusCode < 500;
+                if (doContinue) {
+                    log(chalk.yellow(`HTTP error ${httpStatusCode} ${response.statusText()} while loading ${page.url()}`));
+                }
+            }
+            if (!doContinue) {
+                throw new Error(`HTTP error ${httpStatusCode} ${response.statusText()} while loading ${page.url()}`);
+            }
+        }
     } catch (e) {
         if (e instanceof puppeteer.errors.TimeoutError || (e.name && e.name === 'TimeoutError')) {
-            log(chalk.yellow('Navigation timeout exceeded.'));
+            log(chalk.yellow('navigation timeout exceeded'));
 
             for (let target of targets) {
                 if (target.type === 'page') {
@@ -276,9 +293,10 @@ async function getSiteData(context, url, {
         initialUrl: url.toString(),
         finalUrl,
         timeout,
+        httpStatusCode,
         testStarted,
         testFinished: Date.now(),
-        data
+        data,
     };
 }
 
@@ -337,6 +355,7 @@ async function crawl(url, options) {
             keepOpen,
             onStart: options.onStart,
             onError: options.onError,
+            onHttpError: options.onHttpError,
         }), maxTotalTimeMs);
     } catch(e) {
         log(chalk.red('Crawl failed'), String(e));
@@ -374,6 +393,8 @@ module.exports = crawl;
  * @property {boolean=} keepOpen
  * @property {OnStart=} onStart Called with crawl start time
  * @property {OnError=} onError Called on non-fatal errors, disables logging of errors
+ * @property {OnHttpError=} onHttpError Called on page load errors, return `false` to abort crawl,
+ *      disables logging of such errors, when unspecified crawl is stopped on only some errors
  */
 
 /**
@@ -390,6 +411,7 @@ module.exports = crawl;
  * @property {boolean} keepOpen
  * @property {OnStart=} onStart
  * @property {OnError=} onError
+ * @property {OnHttpError=} onHttpError
  */
 
 /**
@@ -407,10 +429,17 @@ module.exports = crawl;
  */
 
 /**
+ * @callback OnHttpError
+ * @param {number} statusCode
+ * @returns {boolean} Whether to continue, `false` to abort crawl
+ */
+
+/**
  * @typedef {Object} CollectResult
  * @property {string} initialUrl URL from which the crawler began the crawl (as provided by the caller)
  * @property {string} finalUrl URL after page has loaded (can be different from initialUrl if e.g. there was a redirect)
  * @property {boolean} timeout true if page didn't fully load before the timeout and loading had to be stopped by the crawler
+ * @property {number=} httpStatusCode may be unset on timeout
  * @property {number} testStarted time when the crawl started (unix timestamp)
  * @property {number} testFinished time when the crawl finished (unix timestamp)
  * @property {import('./helpers/collectorsList').CollectorData} data object containing output from all collectors
