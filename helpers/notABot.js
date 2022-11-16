@@ -15,14 +15,52 @@ module.exports = () => {
     if (!window.chrome || !window.chrome.runtime) {
         // @ts-ignore
         window.chrome = {
-            /* dump of a real thing */
-            "app": {
-                "isInstalled": false, "InstallState": {"DISABLED": "disabled", "INSTALLED": "installed", "NOT_INSTALLED": "not_installed"}, "RunningState": {"CANNOT_RUN": "cannot_run", "READY_TO_RUN": "ready_to_run", "RUNNING": "running"}
-            }, "runtime": {
-                "OnInstalledReason": {"CHROME_UPDATE": "chrome_update", "INSTALL": "install", "SHARED_MODULE_UPDATE": "shared_module_update", "UPDATE": "update"}, "OnRestartRequiredReason": {"APP_UPDATE": "app_update", "OS_UPDATE": "os_update", "PERIODIC": "periodic"}, "PlatformArch": {"ARM": "arm", "ARM64": "arm64", "MIPS": "mips", "MIPS64": "mips64", "X86_32": "x86-32", "X86_64": "x86-64"}, "PlatformNaclArch": {"ARM": "arm", "MIPS": "mips", "MIPS64": "mips64", "X86_32": "x86-32", "X86_64": "x86-64"}, "PlatformOs": {"ANDROID": "android", "CROS": "cros", "LINUX": "linux", "MAC": "mac", "OPENBSD": "openbsd", "WIN": "win"}, "RequestUpdateCheckStatus": {
-                    "NO_UPDATE": "no_update", "THROTTLED": "throttled", "UPDATE_AVAILABLE": "update_available"
-                }
-            }
+            app: {
+                InstallState: {
+                    DISABLED: "disabled",
+                    INSTALLED: "installed",
+                    NOT_INSTALLED: "not_installed"
+                },
+                RunningState: {
+                    CANNOT_RUN: "cannot_run",
+                    READY_TO_RUN: "ready_to_run",
+                    RUNNING: "running"
+                },
+
+                isInstalled: false,
+                /** @returns {null} */
+                getDetails() {return null;},
+                getIsInstalled() {return false;},
+                installState() {throw new TypeError();},
+                runningState() {return "cannot_run";}
+            },
+
+            /* dummy timings etc. */
+            csi() {
+                return {
+                    onloadT: 1234567890123,
+                    pageT: 456789,
+                    startE: 1234567890123,
+                    tran: 15
+                };
+            },
+            loadTimes() {
+                return {
+                    commitLoadTime: 1234567890,
+                    connectionInfo: "h2",
+                    finishDocumentLoadTime: 1234567890,
+                    finishLoadTime: 1234567890,
+                    firstPaintAfterLoadTime: 0,
+                    firstPaintTime: 1234567890,
+                    navigationType: "Other",
+                    npnNegotiatedProtocol: "h2",
+                    requestTime: 1234567890,
+                    startLoadTime: 1234567890,
+                    wasAlternateProtocolAvailable: false,
+                    wasFetchedViaSpdy: true,
+                    wasNpnNegotiated: true
+                };
+            },
         };
     }
 
